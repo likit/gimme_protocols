@@ -1,3 +1,12 @@
+quality_trim:
+	for f in *.gz; do \
+		gunzip $(f); \
+	done
+	condetri_v2.1.pl -fastq1=6147JAAXX_2_1_pf.fastq -sc=33 -cutfirst 10
+	condetri_v2.1.pl -fastq1=6147JAAXX_3_1_pf.fastq -sc=33 -cutfirst 10
+	condetri_v2.1.pl -fastq1=6147JAAXX_6_1_pf.fastq -sc=33 -cutfirst 10
+	condetri_v2.1.pl -fastq1=6147JAAXX_7_1_pf.fastq -sc=33 -cutfirst 10
+
 install:
 	apt-get install -y ncbi-blast+
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
