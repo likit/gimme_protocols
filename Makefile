@@ -1,6 +1,6 @@
 quality_trim:
 	for f in *.gz; do \
-		gunzip $(f); \
+		gunzip ${f}; \
 	done
 	condetri_v2.1.pl -fastq1=6147JAAXX_2_1_pf.fastq -sc=33 -cutfirst 10
 	condetri_v2.1.pl -fastq1=6147JAAXX_3_1_pf.fastq -sc=33 -cutfirst 10
