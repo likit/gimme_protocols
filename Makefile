@@ -7,6 +7,12 @@ quality_trim:
 	qsub trim_6147JAAXX_6_1_pf.sh
 	qsub trim_6147JAAXX_7_1_pf.sh
 
+velveth:
+	qsub velveth_6147JAAXX_2_1.sh
+	qsub velveth_6147JAAXX_3_1.sh
+	qsub velveth_6147JAAXX_6_1.sh
+	qsub velveth_6147JAAXX_7_1.sh
+
 install:
 	apt-get install -y ncbi-blast+
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
@@ -64,6 +70,8 @@ find-unique-transcripts:
 	cd /mnt/data/data; python /mnt/data/gimme/src/utils/assembly-diff-2.py se_7i_global.clean.nr.fa se_7i_local.clean.nr.fa
 
 preprocess: clean-transcripts remove-redundant-transcripts find-unique-transcripts
+
+assembly: quality_trim velveth
 
 run-blastx:
 
