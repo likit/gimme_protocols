@@ -3,6 +3,7 @@
 #PBS -m abe
 #PBS -N condetri_line7u
 #PBS -A ged-intel11
+#PBS -v DATAPATH
 
-cd /mnt/ls12/preeyanon/gimme/
+cd $DATAPATH
 condetri_v2.1.pl -fastq1=6147JAAXX_6_1_pf.fastq -sc=33 -cutfirst 10
