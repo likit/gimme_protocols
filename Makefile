@@ -39,7 +39,7 @@ install:
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
 	mv blat /usr/local/bin
 	git clone https://github.com/likit/gimme.git
-	cd gimme; python setup.py install
+	cd gimme; git checkout v.0.97; python setup.py install
 	apt-get install -y python-biopython
 	apt-get install -y samtools
 	wget -O seqclean.tgz http://sourceforge.net/projects/seqclean/files/seqclean-x86_64.tgz/download
