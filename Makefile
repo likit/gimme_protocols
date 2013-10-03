@@ -70,6 +70,7 @@ install_khmer_screed:
 install_velvet:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.03.tgz; tar xvfz velvet_1.2.03.tgz
 	cd /mnt/source/velvet_1.2.03/; make 'MAXKMERLENGTH=57'
+	cd /mnt/source/velvet_1.2.03/; cp shuffleSequences_fast*.pl velveth velvetg /usr/local/bin
 
 
 clean:
