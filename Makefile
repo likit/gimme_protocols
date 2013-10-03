@@ -25,6 +25,15 @@ oases:
 	qsub oases_line7i.sh
 	qsub oases_line7u.sh
 
+bowtie_build:
+	bowtie2-build -f chick.fa chick3_bowtie2
+
+tophat:
+	qsub tophat_6147JAAXX_2_1_pf_trim.sh
+	qsub tophat_6147JAAXX_3_1_pf_trim.sh
+	qsub tophat_6147JAAXX_6_1_pf_trim.sh
+	qsub tophat_6147JAAXX_7_1_pf_trim.sh
+
 install:
 	apt-get install -y ncbi-blast+
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
@@ -83,7 +92,9 @@ find-unique-transcripts:
 
 preprocess: clean-transcripts remove-redundant-transcripts find-unique-transcripts
 
-assembly: quality_trim velveth
+global_assembly: quality_trim velveth velvetg oases
+
+local_assembly: bowtie_build tophat
 
 run-blastx:
 
