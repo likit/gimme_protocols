@@ -43,7 +43,7 @@ install:
 	cd /mnt/source/gimme; git checkout v.0.97; python setup.py install
 	apt-get install -y python-biopython
 	apt-get install -y samtools
-	wget -O seqclean.tgz http://sourceforge.net/projects/seqclean/files/seqclean-x86_64.tgz/download
+	cd /mnt/source; wget -O seqclean.tgz http://sourceforge.net/projects/seqclean/files/seqclean-x86_64.tgz/download
 	cd /mnt/source; tar xvfz seqclean.tgz; cd seqclean-x86_64; export PATH=$PATH:$PWD
 	cd /mnt/source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
 	cd /mnt/source; git clone https://github.com/ctb/screed.git; cd screed; python setup.py install
