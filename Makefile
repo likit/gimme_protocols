@@ -35,24 +35,20 @@ tophat:
 	qsub tophat_6147JAAXX_7_1_pf_trim.sh
 
 install:
+	mkdir /mnt/source
 	apt-get install -y ncbi-blast+
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
 	mv blat /usr/local/bin
-	git clone https://github.com/likit/gimme.git
-	cd gimme; git checkout v.0.97; python setup.py install
+	cd /mnt/source; git clone https://github.com/likit/gimme.git
+	cd /mnt/source/gimme; git checkout v.0.97; python setup.py install
 	apt-get install -y python-biopython
 	apt-get install -y samtools
 	wget -O seqclean.tgz http://sourceforge.net/projects/seqclean/files/seqclean-x86_64.tgz/download
-	tar xvfz seqclean.tgz
-	cd seqclean-x86_64; export PATH=$PATH:$PWD
-	cd source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
-	git clone https://github.com/ctb/screed.git
-	cd screed; python setup.py install
-	git clone https://github.com/ged-lab/khmer.git
-	cd khmer; make && make all
-	cd khmer/python; python setup.py build
-	cd khmer/python; python setup.py install
-	cd source; cp Gimme-paper.ipynb /usr/local/notebooks
+	cd /mnt/source; tar xvfz seqclean.tgz; cd seqclean-x86_64; export PATH=$PATH:$PWD
+	cd /mnt/source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
+	cd /mnt/source; git clone https://github.com/ctb/screed.git; cd screed; python setup.py install
+	cd /mnt/source; git clone https://github.com/ged-lab/khmer.git; cd khmer; make; export PYTHONPATH=$PWD/python
+	cd /usr/local/notebooks; ln -sf /root/gimme_protocols/notebooks.ipynb
 
 clean:
 	rm -r gimme
