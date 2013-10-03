@@ -13,6 +13,18 @@ velveth:
 	qsub velveth_6147JAAXX_6_1.sh
 	qsub velveth_6147JAAXX_7_1.sh
 
+velvetg:
+	qsub velvetg_line6i.sh
+	qsub velvetg_line6u.sh
+	qsub velvetg_line7i.sh
+	qsub velvetg_line7u.sh
+
+oases:
+	qsub oases_line6i.sh
+	qsub oases_line6u.sh
+	qsub oases_line7i.sh
+	qsub oases_line7u.sh
+
 install:
 	apt-get install -y ncbi-blast+
 	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
