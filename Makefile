@@ -34,12 +34,13 @@ tophat:
 	qsub tophat_6147JAAXX_6_1_pf_trim.sh
 	qsub tophat_6147JAAXX_7_1_pf_trim.sh
 
-install: install_blast install_blat install_gimme install_biopython \
-	install_samtools install_seqclean install_cdhit install_khmer_screed \
-	install_tophat2 install_bowtie2 install_velvet install_oases
-	cd /usr/local/notebooks; ln -sf /root/gimme_protocols/notebooks.ipynb
+install:
 	mkdir /mnt/source
-	
+	install_blast install_blat install_gimme install_biopython \
+		install_samtools install_seqclean install_cdhit install_khmer_screed \
+		install_tophat2 install_bowtie2 install_velvet install_oases
+	cd /usr/local/notebooks; ln -sf /root/gimme_protocols/notebooks.ipynb
+
 install_blast:
 	apt-get install -y ncbi-blast+
 	
