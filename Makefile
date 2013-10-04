@@ -34,7 +34,9 @@ tophat:
 	qsub tophat_6147JAAXX_6_1_pf_trim.sh
 	qsub tophat_6147JAAXX_7_1_pf_trim.sh
 
-install: install_blast install_blat install_gimme install_biopython install_samtools install_seqclean install_cdhit install_khmer_screed
+install: install_blast install_blat install_gimme install_biopython \
+	install_samtools install_seqclean install_cdhit install_khmer_screed \
+	install_tophat2 install_bowtie2 install_velvet install_oases
 	cd /usr/local/notebooks; ln -sf /root/gimme_protocols/notebooks.ipynb
 	mkdir /mnt/source
 	
@@ -78,7 +80,7 @@ install_oases:
 	cd /mnt/source; cd oases_0.2.06; make 'VELVET_DIR=/mnt/source/velvet_1.2.03' 'MAXKMERLENGTH=57'
 	cd /mnt/source/oases_0.2.06; cp oases /usr/local/bin/
 
-install_tophat:
+install_tophat2:
 	cd /mnt/source; wget http://tophat.cbcb.umd.edu/downloads/tophat-2.0.5.Linux_x86_64.tar.gz
 	cd /mnt/source; tar xvfz tophat-2.0.5.Linux_x86_64.tar.gz
 	cd /mnt/source/tophat-2.0.5.Linux_x86_64; find * -executable -exec cp '{}' /usr/local/bin \;
@@ -89,10 +91,7 @@ install_bowtie2:
 	cd /mnt/source/bowtie2-2.0.0-beta5; cp bowtie2 bowtie2-align bowtie2-build bowtie2-inspect /usr/local/bin
 	
 clean:
-	rm -r gimme
-	cd source; rm seqclean.tgz
-	cd source; rm -r seqclean-x86_64
-	cd source; rm -r cd-hit-v4.5.4-2011-03-07
+	rm -r /mnt/source
 
 clean-transcripts:
 	cd /mnt/data/data; seqclean se_6u_local.fa
