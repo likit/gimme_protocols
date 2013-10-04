@@ -74,7 +74,7 @@ install_velvet:
 
 install_oases:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/oases/oases_0.2.06.tgz; tar xvfz oases_0.2.06.tgz
-	cd /mnt/source; cd oases_0.2.06; make 'VELVET_DIR=/mnt/source/velvet_1.0.03' 'MAXKMERLENGTH=57'
+	cd /mnt/source; cd oases_0.2.06; make 'VELVET_DIR=/mnt/source/velvet_1.2.03' 'MAXKMERLENGTH=57'
 	cd /mnt/source/oases_0.2.06; cp oases /usr/local/bin/
 	
 clean:
