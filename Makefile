@@ -74,6 +74,7 @@ install_khmer_screed:
 	cd /mnt/source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
 	cd /mnt/source; git clone https://github.com/ctb/screed.git; cd screed; python setup.py install
 	cd /mnt/source; git clone https://github.com/ged-lab/khmer.git; cd khmer; make
+	cd /mnt/source/khmer/python; python setup.py install
 
 install_velvet:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.03.tgz; tar xvfz velvet_1.2.03.tgz
