@@ -76,7 +76,12 @@ install_oases:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/oases/oases_0.2.06.tgz; tar xvfz oases_0.2.06.tgz
 	cd /mnt/source; cd oases_0.2.06; make 'VELVET_DIR=/mnt/source/velvet_1.2.03' 'MAXKMERLENGTH=57'
 	cd /mnt/source/oases_0.2.06; cp oases /usr/local/bin/
-	
+
+install_tophat:
+	cd /mnt/source; wget http://tophat.cbcb.umd.edu/downloads/tophat-2.0.5.Linux_x86_64.tar.gz
+	cd /mnt/source; tar xvfz tophat-2.0.5.Linux_x86_64.tar.gz
+	export PATH=$PATH:/mnt/source/tophat-2.0.5.Linux_x86_64
+
 clean:
 	rm -r gimme
 	cd source; rm seqclean.tgz
