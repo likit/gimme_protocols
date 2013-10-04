@@ -57,7 +57,7 @@ install_samtools:
 	
 install_seqclean:
 	cd /mnt/source; wget -O seqclean.tgz http://sourceforge.net/projects/seqclean/files/seqclean-x86_64.tgz/download
-	cd /mnt/source; tar xvfz seqclean.tgz; cd seqclean-x86_64; export PATH=$PATH:$PWD
+	cd /mnt/source; tar xvfz seqclean.tgz; cd seqclean-x86_64; export PATH=$$PATH:$$PWD
 
 install_cdhit:
 	cd /mnt/source; wget https://cdhit.googlecode.com/files/cd-hit-v4.5.4-2011-03-07.tgz
@@ -65,7 +65,7 @@ install_cdhit:
 install_khmer_screed:
 	cd /mnt/source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
 	cd /mnt/source; git clone https://github.com/ctb/screed.git; cd screed; python setup.py install
-	cd /mnt/source; git clone https://github.com/ged-lab/khmer.git; cd khmer; make; export PYTHONPATH=$PWD/python
+	cd /mnt/source; git clone https://github.com/ged-lab/khmer.git; cd khmer; make; export PYTHONPATH=$$PWD/python
 	
 install_velvet:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.03.tgz; tar xvfz velvet_1.2.03.tgz
