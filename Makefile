@@ -40,17 +40,18 @@ PACKAGES = install_blast install_blat install_gimme install_biopython \
 
 .PHONY: $(PACKAGES)
 
-install:
+preinstall:
 	mkdir /mnt/source
-	$(PACKAGES)
+
+install: clean preinstall $(PACKAGES)
 	cd /usr/local/notebooks; ln -sf /root/gimme_protocols/notebooks.ipynb
 
 install_blast:
 	apt-get install -y ncbi-blast+
 	
 install_blat:
-	wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
-	mv blat /usr/local/bin
+	cd /mnt/source; wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
+	mv /mnt/source/blat /usr/local/bin
 	
 install_gimme:
 	cd /mnt/source; git clone https://github.com/likit/gimme.git
@@ -73,8 +74,7 @@ install_khmer_screed:
 	cd /mnt/source; tar xfvz cd-hit-v4.5.4-2011-03-07.tgz; cd cd-hit-v4.5.4-2011-03-07; make && make install
 	cd /mnt/source; git clone https://github.com/ctb/screed.git; cd screed; python setup.py install
 	cd /mnt/source; git clone https://github.com/ged-lab/khmer.git; cd khmer; make
-	PYTHONPATH:=/mnt/source/khmer/python
-	
+
 install_velvet:
 	cd /mnt/source; wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.03.tgz; tar xvfz velvet_1.2.03.tgz
 	cd /mnt/source/velvet_1.2.03/; make 'MAXKMERLENGTH=57'
