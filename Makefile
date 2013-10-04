@@ -80,7 +80,7 @@ install_oases:
 install_tophat:
 	cd /mnt/source; wget http://tophat.cbcb.umd.edu/downloads/tophat-2.0.5.Linux_x86_64.tar.gz
 	cd /mnt/source; tar xvfz tophat-2.0.5.Linux_x86_64.tar.gz
-	export PATH=$PATH:/mnt/source/tophat-2.0.5.Linux_x86_64
+	export PATH=$$PATH:/mnt/source/tophat-2.0.5.Linux_x86_64
 
 clean:
 	rm -r gimme
