@@ -82,7 +82,12 @@ install_tophat:
 	cd /mnt/source; wget http://tophat.cbcb.umd.edu/downloads/tophat-2.0.5.Linux_x86_64.tar.gz
 	cd /mnt/source; tar xvfz tophat-2.0.5.Linux_x86_64.tar.gz
 	cd /mnt/source/tophat-2.0.5.Linux_x86_64; find * -executable -exec cp '{}' /usr/local/bin \;
-
+	
+install_bowtie2:
+	cd /mnt/source; wget http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.0.0-beta5/bowtie2-2.0.0-beta5-linux-x86_64.zip
+	cd /mnt/source; unzip bowtie2-2.0.0-beta5-linux-x86_64.zip
+	cd /mnt/source/bowtie2-2.0.0-beta5; cp bowtie2 bowtie2-align bowtie2-build bowtie2-inspect /usr/local/bin
+	
 clean:
 	rm -r gimme
 	cd source; rm seqclean.tgz
