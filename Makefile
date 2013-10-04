@@ -25,10 +25,7 @@ oases:
 	qsub oases_line7i.sh
 	qsub oases_line7u.sh
 
-bowtie_build:
-	cd /mnt/data; bowtie2-build -f chick.fa chick3_bowtie2
-
-tophat: bowtie_build
+tophat:
 	qsub tophat_6147JAAXX_2_1_pf_trim.sh
 	qsub tophat_6147JAAXX_3_1_pf_trim.sh
 	qsub tophat_6147JAAXX_6_1_pf_trim.sh
