@@ -31,6 +31,12 @@ tophat:
 	qsub tophat_6147JAAXX_6_1_pf_trim.sh
 	qsub tophat_6147JAAXX_7_1_pf_trim.sh
 
+tophat_ec2:
+	cd /mnt/; tophat -p 2 -o line6u_tophat chick3_bowtie2 6147JAAXX_2_1_pf_trim.fastq
+	cd /mnt/; tophat -p 2 -o line6i_tophat chick3_bowtie2 6147JAAXX_3_1_pf_trim.fastq
+	cd /mnt/; tophat -p 2 -o line7u_tophat chick3_bowtie2 6147JAAXX_6_1_pf_trim.fastq
+	cd /mnt/; tophat -p 2 -o line7i_tophat chick3_bowtie2 6147JAAXX_7_1_pf_trim.fastq
+	
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
 		install_tophat2 install_bowtie2 install_velvet install_oases
