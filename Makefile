@@ -44,12 +44,14 @@ index_samfiles:
 	cd line7i_tophat; samtools index accepted_hits.bam
 
 extract_reads:
-	cd line6u_tophat; \
+	for dir in line*tophat; do \
+	cd $$dir; \
 	for chr in `tail /mnt/chromosomes.list`; do \
-	printf "extracting %s..." $$chr; \
+	printf "extracting %s... from %s" $$chr $$dir; \
 	samtools view -b -o ${chr}.bam accepted_hits.bam $$chr; \
+	done; \
 	done
-	
+
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
 		install_tophat2 install_bowtie2 install_velvet install_oases
