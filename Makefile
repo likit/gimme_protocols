@@ -45,12 +45,13 @@ index_samfiles:
 
 extract_reads:
 	for dir in line*tophat; do \
-	cd $$dir; \
-	printf "working on %s:" $$dir; \
-	for chr in `tail /mnt/chromosomes.list`; do \
-	printf "\textracting %s...\n" $$chr; \
-	samtools view -b -o ${chr}.bam accepted_hits.bam $$chr; \
-	done; \
+		cd $$dir; \
+		printf "working on %s:\n" $$dir; \
+			for chr in `tail /mnt/chromosomes.list`; do \
+				printf "\textracting %s...\n" $$chr; \
+				samtools view -b -o ${chr}.bam accepted_hits.bam $$chr; \
+		cd /mnt; \
+		done; \
 	done
 
 PACKAGES = install_blast install_blat install_gimme install_biopython \
