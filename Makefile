@@ -44,7 +44,8 @@ index_samfiles:
 	cd line7i_tophat; samtools index accepted_hits.bam
 
 extract_reads:
-	cd line6u_tophat; or chr in `tail ../chromosomes.list`; do \
+	cd line6u_tophat; \
+	for chr in `tail ../chromosomes.list`; do \
 	printf "extracting %s..." ${chr}; \
 	samtools view -b -o ${chr}.bam accepted_hits.bam ${chr}; \
 	done
