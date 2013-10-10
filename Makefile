@@ -46,8 +46,8 @@ index_samfiles:
 extract_reads:
 	cd line6u_tophat; \
 	for chr in `tail /mnt/chromosomes.list`; do \
-	printf "extracting %s..." ${chr}; \
-	samtools view -b -o ${chr}.bam accepted_hits.bam ${chr}; \
+	printf "extracting %s..." $$chr; \
+	samtools view -b -o ${chr}.bam accepted_hits.bam $$chr; \
 	done
 	
 PACKAGES = install_blast install_blat install_gimme install_biopython \
