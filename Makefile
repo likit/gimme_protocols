@@ -36,7 +36,13 @@ tophat_ec2:
 	cd /mnt/; tophat -p 2 -o line6i_tophat chick3_bowtie2 6147JAAXX_3_1_pf_trim.fastq
 	cd /mnt/; tophat -p 2 -o line7u_tophat chick3_bowtie2 6147JAAXX_6_1_pf_trim.fastq
 	cd /mnt/; tophat -p 2 -o line7i_tophat chick3_bowtie2 6147JAAXX_7_1_pf_trim.fastq
-	
+
+index_samfiles:
+	cd line6u_tophat; samtools index accepted_hits.bam
+	cd line6i_tophat; samtools index accepted_hits.bam
+	cd line7u_tophat; samtools index accepted_hits.bam
+	cd line7i_tophat; samtools index accepted_hits.bam
+
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
 		install_tophat2 install_bowtie2 install_velvet install_oases
@@ -136,7 +142,7 @@ preprocess: clean-transcripts remove-redundant-transcripts find-unique-transcrip
 
 global_assembly: quality_trim velveth velvetg oases
 
-local_assembly: bowtie_build tophat
+local_assembly: tophat index_samfiles
 
 run-blastx:
 
