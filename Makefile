@@ -47,7 +47,7 @@ extract_reads:
 	for dir in line*tophat; do \
 	cd $$dir; \
 	printf "working on %s:\n" $$dir; \
-		for chr in `tail /mnt/chromosomes.list`; do \
+		for chr in `cat /mnt/chromosomes.list`; do \
 		printf "\textracting %s...\n" $$chr; \
 		samtools view -b -o $$chr.bam accepted_hits.bam $$chr; \
 		done; \
