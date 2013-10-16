@@ -54,6 +54,15 @@ extract_reads:
 	cd /mnt; \
 	done
 
+local_velveth:
+	for dir in line*tophat; do \
+	cd $$dir; \
+		for chr in chr*bam; do \
+		velveth assembly 21,31,2 -short -bam $$chr; \
+		done; \
+	cd /mnt; \
+	done
+	
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
 		install_tophat2 install_bowtie2 install_velvet install_oases
