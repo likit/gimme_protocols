@@ -58,7 +58,7 @@ local_velveth:
 	cd /mnt; for dir in line*tophat; do \
 	cd $$dir; \
 		for chr in chr*bam; do \
-		velveth assembly 21,31,2 -short -bam $$chr; \
+		velveth $$chr_assembly 21,31,2 -short -bam $$chr; \
 		done; \
 	cd /mnt; \
 	done
