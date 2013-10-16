@@ -44,7 +44,7 @@ index_samfiles:
 	cd line7i_tophat; samtools index accepted_hits.bam
 
 extract_reads:
-	for dir in line*tophat; do \
+	cd /mnt; for dir in line*tophat; do \
 	cd $$dir; \
 	printf "working on %s:\n" $$dir; \
 		for chr in `cat /mnt/chromosomes.list`; do \
@@ -55,7 +55,7 @@ extract_reads:
 	done
 
 local_velveth:
-	for dir in line*tophat; do \
+	cd /mnt; for dir in line*tophat; do \
 	cd $$dir; \
 		for chr in chr*bam; do \
 		velveth assembly 21,31,2 -short -bam $$chr; \
