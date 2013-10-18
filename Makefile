@@ -67,7 +67,7 @@ local_velvetg:
 	cd /mnt; for dir in line*tophat; do \
 	cd $$dir; \
 		for chr in chr*asm*; do \
-		velvetg $$chr -read_trkg yes -unused_reads yes
+		velvetg $$chr -read_trkg yes -unused_reads yes; \
 		done; \
 	cd /mnt; \
 	done
