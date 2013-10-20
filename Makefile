@@ -72,6 +72,15 @@ local_velvetg:
 	cd /mnt; \
 	done
 
+local_oases:
+	cd /mnt; for dir in line*tophat; do \
+	cd $$dir; \
+		for chr in chr*asm*; do \
+		oases $$chr -unused_reads yes; \
+		done; \
+	cd /mnt; \
+	done
+
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
 		install_tophat2 install_bowtie2 install_velvet install_oases
