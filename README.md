@@ -5,7 +5,7 @@ To setup an EC2 machine, do the following
 ###On Amazon EC2
 + Launch EC2 instance with **beacon-2012.09.03 (ami-c17ec8a8)**. Choose **m1.large** for instance type.
 + Create volume with (SNAPSHOT) and mount the volume to /mnt/data/
-+ Login as a root
++ Login as a root and go to **/root**
 + Run **git clone https://github.com/likit/gimme_protocols.git protocols**
 + Run **make -f protocols/Makefile install** in **/root** directory
 + Open Ipython notebook by entering https://youramazonpublicdns in your browser (make sure HTTPS rule is included in your security group)
