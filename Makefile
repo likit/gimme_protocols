@@ -146,6 +146,12 @@ install_bowtie2:
 clean:
 	rm -r /mnt/source
 
+combine-transcripts:
+	cd /mnt/data/line6u_tophat; \
+		for d in chr*asm*; \
+			do cat $$d/transcripts.fa >> ../se_6u_local.fa; \
+		done
+		
 clean-transcripts:
 	cd /mnt/data/data; seqclean se_6u_local.fa
 	cd /mnt/data/data; seqclean se_6i_local.fa
