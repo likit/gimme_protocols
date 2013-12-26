@@ -134,14 +134,14 @@ combine-transcripts:
 
 clean-transcripts:
 
-	cd /mnt/data/; seqclean line6u_local.fa
-	cd /mnt/data/; seqclean line6i_local.fa
-	cd /mnt/data/; seqclean line7u_local.fa
-	cd /mnt/data/; seqclean line7i_local.fa
-	cd /mnt/data/; seqclean line6u_global.fa
-	cd /mnt/data/; seqclean line6i_global.fa
-	cd /mnt/data/; seqclean line7u_global.fa
-	cd /mnt/data/; seqclean line7i_global.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line6u_local.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line6i_local.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line7u_local.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line7i_local.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line6u_global.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line6i_global.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line7u_global.fa
+	cd /mnt/data/; source/seqclean-x86_64/seqclean line7i_global.fa
 
 remove-redundant-transcripts:
 
