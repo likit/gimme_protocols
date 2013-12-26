@@ -183,6 +183,11 @@ global_assembly: quality_trim velveth velvetg oases
 local_assembly: tophat index_samfiles
 
 run-blastx:
+	cd /mnt/data/data; \
+	export BLASTDB=/mnt/data/data/blastdb; \
+	for input in *.uniq.long; do \
+		blastx -evalue 1e-20 -outfmt 5 -query $$input -db mouse.proteins -out $$input.xml; \
+	done
 
 construct-gene-models:
 	cd /mnt/data/data; cat *clean.nr.fa > all_clean.fa
