@@ -165,16 +165,20 @@ combine-transcripts:
 		done
 		
 	cd /mnt/data/; \
-		do cat line6u_global_*.transcripts.fa >> se_6u_global.fa; \
+		for f in line6u_global_*.transcripts.fa; \
+		do python source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line6u_global.fa; \
 	done
 	cd /mnt/data/; \
-		do cat line6i_global_*.transcripts.fa >> se_6i_global.fa; \
+		for f in line6i_global_*.transcripts.fa; \
+		do python source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line6i_global.fa; \
 	done
 	cd /mnt/data/; \
-		do cat line7u_global_*.transcripts.fa >> se_7u_global.fa; \
+		for f in line7u_global_*.transcripts.fa; \
+		do python source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line7u_global.fa; \
 	done
 	cd /mnt/data/; \
-		do cat line7i_global_*.transcripts.fa >> se_7i_global.fa; \
+		for f in line7i_global_*.transcripts.fa; \
+		do python source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line7i_global.fa; \
 	done
 
 clean-transcripts:
