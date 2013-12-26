@@ -32,3 +32,24 @@ To setup an EC2 machine, do the following
 + screed
 
 (*) _These packages are not required to run code in the Ipython notebook._
+
+###Data preprocessing
+
+_Note: Preprocessing may take a long time. You can skip this step and use pre-preprocessed data to reproduce results in this notebook._
+
+Run **make preprocess** to preprocess transcripts and other required data to be used in this notebook.
+
+This step will take a while, so we recommend running it in Shell.
+
+In addition, each step can be run separately with its own make command. For example, running **make clean-transcript** will only run Seqclean to clean transcripts.
+
+Preprocessing includes the following steps:
+
++ **clean-transcripts :** clean transcripts with seqclean
++ **remove-redundant-transcripts :** remove redundant transcripts with CD-HIT
++ **find-unique-transcripts :** find unique transcripts between global and local assembly
+
+These steps are not included in preprocessing. We recommend using pre-preprocessed data:
+
++ **run-blastx :** run BLASTX against mouse proteins
++ **construct-gene-models :** run Gimme to construct gene models
