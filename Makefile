@@ -147,23 +147,24 @@ clean:
 	rm -r /mnt/source
 
 combine-transcripts:
+
 	cd /mnt/data/line6u_tophat; \
-		for d in chr*asm*; \
-			do cat $$d/transcripts.fa >> ../se_6u_local.fa; \
-		done
+	for d in chr*asm*; \
+		do python ../../source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line6u_local_$$d >> line6u_local.fa; \
+	done
 	cd /mnt/data/line6i_tophat; \
-		for d in chr*asm*; \
-			do cat $$d/transcripts.fa >> ../se_6i_local.fa; \
-		done
+	for d in chr*asm*; \
+		do python ../../source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line6i_local_$$d >> line6i_local.fa; \
+	done
 	cd /mnt/data/line7u_tophat; \
-		for d in chr*asm*; \
-			do cat $$d/transcripts.fa >> ../se_7u_local.fa; \
-		done
+	for d in chr*asm*; \
+		do python ../../source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line7u_local_$$d >> line7u_local.fa; \
+	done
 	cd /mnt/data/line7i_tophat; \
-		for d in chr*asm*; \
-			do cat $$d/transcripts.fa >> ../se_7i_local.fa; \
-		done
-		
+	for d in chr*asm*; \
+		do python ../../source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line7i_local_$$d >> line7i_local.fa; \
+	done
+
 	cd /mnt/data/; \
 		for f in line6u_global_*.transcripts.fa; \
 		do python source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line6u_global.fa; \
