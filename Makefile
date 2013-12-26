@@ -151,6 +151,18 @@ combine-transcripts:
 		for d in chr*asm*; \
 			do cat $$d/transcripts.fa >> ../se_6u_local.fa; \
 		done
+	cd /mnt/data/line6i_tophat; \
+		for d in chr*asm*; \
+			do cat $$d/transcripts.fa >> ../se_6i_local.fa; \
+		done
+	cd /mnt/data/line7u_tophat; \
+		for d in chr*asm*; \
+			do cat $$d/transcripts.fa >> ../se_7u_local.fa; \
+		done
+	cd /mnt/data/line7i_tophat; \
+		for d in chr*asm*; \
+			do cat $$d/transcripts.fa >> ../se_7i_local.fa; \
+		done
 		
 clean-transcripts:
 	cd /mnt/data/data; seqclean se_6u_local.fa
