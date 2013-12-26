@@ -164,6 +164,19 @@ combine-transcripts:
 			do cat $$d/transcripts.fa >> ../se_7i_local.fa; \
 		done
 		
+	cd /mnt/data/; \
+		do cat line6u_global_*.transcripts.fa >> se_6u_global.fa; \
+	done
+	cd /mnt/data/; \
+		do cat line6i_global_*.transcripts.fa >> se_6i_global.fa; \
+	done
+	cd /mnt/data/; \
+		do cat line7u_global_*.transcripts.fa >> se_7u_global.fa; \
+	done
+	cd /mnt/data/; \
+		do cat line7i_global_*.transcripts.fa >> se_7i_global.fa; \
+	done
+
 clean-transcripts:
 	cd /mnt/data/data; seqclean se_6u_local.fa
 	cd /mnt/data/data; seqclean se_6i_local.fa
