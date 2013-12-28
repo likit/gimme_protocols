@@ -145,12 +145,15 @@ clean-transcripts:
 
 remove-redundant-transcripts:
 
-	cd /mnt/data; cat line*global.fa.clean >> all_global.fa.clean
-	cd /mnt/data; cat line*local.fa.clean >> all_local.fa.clean
-	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i all_local.fa.clean -o all_local.fa.clean.nr
-	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i all_global.fa.clean -o all_global.fa.clean.nr
-	cd /mnt/data; cat all_global.fa.clean.nr all_local.fa.clean.nr >> all.fa.clean
-	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line6u_local.fa.clean -o line6u_local.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line6i_local.fa.clean -o line6i_local.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line7u_local.fa.clean -o line7u_local.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line7i_local.fa.clean -o line7i_local.fa.clean.nr
+
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line6u_global.fa.clean -o line6u_global.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line6i_global.fa.clean -o line6i_global.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line7u_global.fa.clean -o line7u_global.fa.clean.nr
+	cd /mnt/data; cd-hit-est -d 0 -c 1.0 -M 8000 -i line7i_global.fa.clean -o line7i_global.fa.clean.nr
 
 find-unique-transcripts:
 
