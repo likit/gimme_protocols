@@ -182,9 +182,9 @@ run-blastx:
 
 construct-gene-models:
 
-	cd /mnt/data/data; cat *clean.nr.fa > all_clean.fa
-	cd /mnt/data/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all_clean.fa -o all_clean.nr.fa
-	cd /mnt/data/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all_clean.nr.fa all_clean.nr.psl
+	cd /mnt/data/data; cat *clean.nr > all.fa.clean
+	cd /mnt/data/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
+	cd /mnt/data/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
 
 .PHONY: $(PACKAGES)
 
