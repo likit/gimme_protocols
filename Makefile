@@ -180,7 +180,7 @@ construct-gene-models:
 
 clean-up-gene-models:
 
-	cd /mnt/data; /mnt/source/gimme/src/utils/get_transcripts_seq.py all.fa.clean.nr.bed > all.fa.clean.nr.bed.fa
+	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcripts_seq.py all.fa.clean.nr.bed > all.fa.clean.nr.bed.fa
 	cd /mnt/data; /mnt/source/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
 
 find-unique-transcripts:
