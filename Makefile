@@ -207,6 +207,8 @@ install_blat:
 
 	cd /mnt/source; wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
 	mv /mnt/source/blat /usr/local/bin
+	cd /mnt/source; wget http://genome-test.cse.ucsc.edu/~kent/exe/linux/pslUtils.zip; \
+		unzip pslUtils.zip
 
 install_gimme:
 
