@@ -186,8 +186,8 @@ construct-gene-models:
 	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.fa.clean.nr.psl > all.fa.clean.nr.psl.sorted
-	cd /mnt/data; pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.psl.best info
-	cd /mnt/data; python source/gimme/src/gimme.py all.fa.clean.nr.psl.best > all.fa.clean.nr.bed
+	cd /mnt/data; ../source/pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.psl.best info
+	cd /mnt/data; python ../source/gimme/src/gimme.py all.fa.clean.nr.psl.best > all.fa.clean.nr.bed
 
 .PHONY: $(PACKAGES)
 
@@ -205,10 +205,8 @@ install_blast:
 
 install_blat:
 
-	cd /mnt/source; wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
-	mv /mnt/source/blat /usr/local/bin
-	cd /mnt/source; wget http://genome-test.cse.ucsc.edu/~kent/exe/linux/pslUtils.zip; \
-		unzip pslUtils.zip
+	cd /mnt/source; wget http://genome-test.cse.ucsc.edu/~kent/exe/linux/blatSuite.zip; \
+		unzip blatSuite.zip
 
 install_gimme:
 
@@ -216,6 +214,7 @@ install_gimme:
 	cd /mnt/source/gimme; git checkout v.0.97; python setup.py install
 
 install_biopython:
+
 	apt-get install -y python-biopython
 
 install_samtools:
