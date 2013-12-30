@@ -185,6 +185,9 @@ construct-gene-models:
 	cd /mnt/data; cat *clean.nr > all.fa.clean
 	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
+	cd /mnt/data; sort -k 10 all.fa.clean.nr.psl > all.fa.clean.nr.psl.sorted
+	cd /mnt/data; pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.best info
+	cd /mnt/data; python source/gimme/src/gimme.py all.fa.clean.nr.best > all.fa.clean.nr.bed
 
 .PHONY: $(PACKAGES)
 
