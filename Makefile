@@ -172,7 +172,7 @@ local_assembly: tophat index_samfiles
 construct-gene-models-global:
 
 	cd /mnt/data; cat *global*clean.nr > all.global.fa.clean
-	cd /mnt/data; /mnt/source/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
+	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.global.fa.clean.nr all.global.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.global.fa.clean.nr.psl > all.global.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.global.fa.clean.nr.psl.sorted all.global.fa.clean.nr.psl.best info
@@ -181,7 +181,7 @@ construct-gene-models-global:
 construct-gene-models-global-local:
 
 	cd /mnt/data; cat *clean.nr > all.fa.clean
-	cd /mnt/data; /mnt/source/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
+	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.fa.clean.nr.psl > all.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.psl.best info
