@@ -169,7 +169,16 @@ global_assembly: quality_trim velveth velvetg oases
 
 local_assembly: tophat index_samfiles
 
-construct-gene-models:
+construct-gene-models-global:
+
+	cd /mnt/data; cat *global*clean.nr > all.global.fa.clean
+	cd /mnt/data; /mnt/source/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
+	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.global.fa.clean.nr all.global.fa.clean.nr.psl
+	cd /mnt/data; sort -k 10 all.global.fa.clean.nr.psl > all.global.fa.clean.nr.psl.sorted
+	cd /mnt/data; ../source/pslReps -nohead -singleHit all.global.fa.clean.nr.psl.sorted all.global.fa.clean.nr.psl.best info
+	cd /mnt/data; python ../source/gimme/src/gimme.py all.global.fa.clean.nr.psl.best > all.global.fa.clean.nr.bed
+
+construct-gene-models-global-local:
 
 	cd /mnt/data; cat *clean.nr > all.fa.clean
 	cd /mnt/data; /mnt/source/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
