@@ -172,7 +172,7 @@ local_assembly: tophat index_samfiles
 construct-gene-models-global:
 
 	cd /mnt/data; cat *global*clean.nr > all.global.fa.clean
-	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.global.fa.clean.nr all.global.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.global.fa.clean.nr.psl > all.global.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.global.fa.clean.nr.psl.sorted all.global.fa.clean.nr.psl.best info
@@ -181,7 +181,7 @@ construct-gene-models-global:
 construct-gene-models-local:
 
 	cd /mnt/data; cat *local*clean.nr > all.local.fa.clean
-	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.local.fa.clean -o all.local.fa.clean.nr
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.local.fa.clean -o all.local.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.local.fa.clean.nr all.local.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.local.fa.clean.nr.psl > all.local.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.local.fa.clean.nr.psl.sorted all.local.fa.clean.nr.psl.best info
@@ -190,13 +190,23 @@ construct-gene-models-local:
 construct-gene-models-global-local:
 
 	cd /mnt/data; cat *clean.nr > all.fa.clean
-	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
 	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.fa.clean.nr.psl > all.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.psl.best info
 	cd /mnt/data; python ../source/gimme/src/gimme.py all.fa.clean.nr.psl.best > all.fa.clean.nr.bed
 
-clean-up-gene-models:
+clean-up-gene-models-global:
+
+	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.global.fa.clean.nr.bed chick.fa > all.global.fa.clean.nr.bed.fa
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.global.fa.clean.nr.bed.fa -o all.global.fa.clean.nr.bed.fa.nr99
+
+clean-up-gene-models-local:
+
+	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.local.fa.clean.nr.bed chick.fa > all.local.fa.clean.nr.bed.fa
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.local.fa.clean.nr.bed.fa -o all.local.fa.clean.nr.bed.fa.nr99
+
+clean-up-gene-models-global-local:
 
 	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
 	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
@@ -261,6 +271,7 @@ install_seqclean:
 install_cdhit:
 
 	cd /mnt/source; wget https://cdhit.googlecode.com/files/cd-hit-v4.5.4-2011-03-07.tgz
+	cd /mnt/source/cd-hit-v4.5.4-2011-03-07; make install
 
 install_khmer_screed:
 
