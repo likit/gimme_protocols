@@ -209,7 +209,7 @@ clean-up-gene-models-local:
 clean-up-gene-models-global-local:
 
 	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
-	cd /mnt/data; /mnt/source/cd-hit-v4.5.4-2011-03-07/cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
+	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
 
 find-unique-transcripts:
 
