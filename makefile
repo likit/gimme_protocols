@@ -213,14 +213,14 @@ clean-up-gene-models-global-local:
 
 find-unique-transcripts:
 
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line6u_local.fa.clean.nr line6u_global.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line6i_local.fa.clean.nr line6i_global.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line7u_local.fa.clean.nr line7u_global.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line7i_local.fa.clean.nr line7i_global.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line6u_global.fa.clean.nr line6u_local.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line6i_global.fa.clean.nr line6i_local.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line7u_global.fa.clean.nr line7u_local.fa.clean.nr
-	cd /mnt/data; python /mnt/source/gimme/src/utils/assembly-diff-2.py line7i_global.fa.clean.nr line7i_local.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line6u_local.fa.clean.nr line6u_global.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line6i_local.fa.clean.nr line6i_global.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line7u_local.fa.clean.nr line7u_global.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line7i_local.fa.clean.nr line7i_global.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line6u_global.fa.clean.nr line6u_local.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line6i_global.fa.clean.nr line6i_local.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line7u_global.fa.clean.nr line7u_local.fa.clean.nr
+	cd /mnt/data; python ~/protocols/assembly-diff.py line7i_global.fa.clean.nr line7i_local.fa.clean.nr
 
 run-blastx:
 
