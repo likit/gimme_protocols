@@ -15,6 +15,7 @@ To setup an EC2 machine, do the following
 
 + Blat *
 + BLAST+ 2.2.25 *
++ Bowtie 1.0.0
 + Bowtie2*
 + Tophat2*
 + Cufflinks2*
@@ -30,6 +31,7 @@ To setup an EC2 machine, do the following
 + Samtools 0.1.18
 + khmer
 + screed
++ RSEM 1.2.7
 
 (*) _These packages are not required to run code in the Ipython notebook._
 
