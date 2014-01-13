@@ -53,3 +53,8 @@ tar xvfz gmap-gsnap-2013-11-27.tar.gz
 cd gmap-gsnap-2013-11-27/
 
 ./configure && make && make install
+
+BLAT installation
+-----------------
+
+make sure BLAT in in PATH.
