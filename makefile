@@ -102,7 +102,8 @@ local_oases:
 
 PACKAGES = install_blast install_blat install_gimme install_biopython \
 		install_samtools install_seqclean install_cdhit install_khmer_screed \
-		install_tophat2 install_bowtie2 install_velvet install_oases
+		install_tophat2 install_bowtie2 install_velvet install_oases \
+		install_condetri
 
 combine-transcripts:
 
@@ -200,16 +201,19 @@ clean-up-gene-models-global:
 
 	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.global.fa.clean.nr.bed chick.fa > all.global.fa.clean.nr.bed.fa
 	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.global.fa.clean.nr.bed.fa -o all.global.fa.clean.nr.bed.fa.nr99
+	python ../source/gimme/src/utils/cdhit_transcript.py all.global.fa.clean.nr.bed all.global.fa.clean.nr.bed.fa.nr99 > all.global.fa.clean.nr.bed.fa.nr99.bed
 
 clean-up-gene-models-local:
 
-	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.local.fa.clean.nr.bed chick.fa > all.local.fa.clean.nr.bed.fa
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.local.fa.clean.nr.bed.fa -o all.local.fa.clean.nr.bed.fa.nr99
+	#cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.local.fa.clean.nr.bed chick.fa > all.local.fa.clean.nr.bed.fa
+	#cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.local.fa.clean.nr.bed.fa -o all.local.fa.clean.nr.bed.fa.nr99
+	python ../source/gimme/src/utils/cdhit_transcript.py all.local.fa.clean.nr.bed all.local.fa.clean.nr.bed.fa.nr99 > all.local.fa.clean.nr.bed.fa.nr99.bed
 
 clean-up-gene-models-global-local:
 
-	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
+	#cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
+	#cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
+	python ../source/gimme/src/utils/cdhit_transcript.py all.fa.clean.nr.bed all.fa.clean.nr.bed.fa.nr99 > all.fa.clean.nr.bed.fa.nr99.bed
 
 find-unique-transcripts:
 
@@ -230,6 +234,24 @@ run-blastx:
 		blastx -evalue 1e-20 -outfmt 5 -query $$input -db mouse.proteins -out $$input.xml; \
 	done
 
+## Mouse data
+#######################
+quality-trim-mouse:
+
+	perl /mnt/source/condetri_v2.1.pl -fastq1=SRR203276_1.fastq -fastq2=SRR203276_2.fastq -sc=33 -prefix=SRR203276 -minlen=50 -cutfirst 10
+
+run-tophat-mouse:
+
+	#cd /mnt/data; bowtie2-build mm9.fa mm9
+	cd /mnt/data; tophat2 -p 2 -r 150 -o tophat_mouse mm9 SRR203276_trim1.fastq SRR203276_trim2.fastq
+
+## mRNA and EST alignment
+########################
+
+run-blat-mrna-est:
+
+	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit mrna.fa mrna.fa.psl
+	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit est.fa est.fa.psl
 
 .PHONY: $(PACKAGES)
 
@@ -241,14 +263,17 @@ install: clean preinstall $(PACKAGES)
 
 	cd /usr/local/notebooks; ln -sf /root/protocol/notebooks.ipynb
 
+install_condetri:
+
+	cd /mnt/source; wget https://condetri.googlecode.com/files/condetri_v2.1.pl
+
 install_blast:
 
 	apt-get install -y ncbi-blast+
 
 install_blat:
 
-	cd /mnt/source; wget http://genome-test.cse.ucsc.edu/~kent/exe/linux/blatSuite.zip; \
-		unzip blatSuite.zip
+	cd /mnt/source; wget http://genome-test.cse.ucsc.edu/~kent/exe/linux/blatSuite.zip; unzip blatSuite.zip
 
 install_gimme:
 
