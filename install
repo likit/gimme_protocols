@@ -71,6 +71,10 @@ install_bowtie2:
 	cd /mnt/source; unzip bowtie2-2.0.0-beta5-linux-x86_64.zip
 	cd /mnt/source/bowtie2-2.0.0-beta5; cp bowtie2 bowtie2-align bowtie2-build bowtie2-inspect /usr/local/bin
 	
+install_condetri:
+
+       cd /mnt/source; wget https://condetri.googlecode.com/files/condetri_v2.1.pl
+
 clean:
 
 	rm -r /mnt/source
