@@ -290,3 +290,9 @@ rsem-calculate-expr:
 		protocol/rsem_calculate_expr_single.sh
 	qsub -v input_read="line7i.se.fq",sample_name="line7i-rsem-local",index="all.local.fa.clean.nr" \
 		protocol/rsem_calculate_expr_single.sh
+
+filter-low-isopct:
+
+	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.bed *rsem-all.genes.results > all.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.global.fa.clean.nr.bed *rsem-global.genes.results > all.global.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.local.fa.clean.nr.bed *rsem-local.genes.results > all.local.fa.clean.nr.flt.bed
