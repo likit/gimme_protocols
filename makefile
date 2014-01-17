@@ -310,3 +310,9 @@ gimme-assembly-cufflinks:
 	python /mnt/source/gimme/src/gimme.py all.fa.clean.nr.bed cuffmerge/transcripts.bed > all.fa.clean.nr.cuff.bed
 
 gimme-assembly-cufflinks-mrna:
+
+filter-low-isopct:
+
+	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.bed *rsem-all.genes.results > all.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.global.fa.clean.nr.bed *rsem-global.genes.results > all.global.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.local.fa.clean.nr.bed *rsem-local.genes.results > all.local.fa.clean.nr.flt.bed
