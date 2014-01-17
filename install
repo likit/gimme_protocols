@@ -73,7 +73,13 @@ install_bowtie2:
 	
 install_condetri:
 
-       cd /mnt/source; wget https://condetri.googlecode.com/files/condetri_v2.1.pl
+	cd /mnt/source; wget https://condetri.googlecode.com/files/condetri_v2.1.pl
+
+install_cufflinks:
+
+	cd /mnt/source; wget http://cufflinks.cbcb.umd.edu/downloads/cufflinks-2.0.0.Linux_x86_64.tar.gz
+	cd /mnt/source; tar xvfz cufflinks-2.0.0.Linux_x86_64.tar.gz
+	cd /mnt/source; mv cufflinks-2.0.0.Linux_x86_64 cufflinks2
 
 clean:
 
