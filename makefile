@@ -250,8 +250,12 @@ run-tophat-mouse:
 
 run-blat-mrna-est:
 
-	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit mrna.fa mrna.fa.psl
-	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit est.fa est.fa.psl
+	#cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit mrna.fa mrna.fa.psl
+	#cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit est.fa est.fa.psl
+	cd /mnt/data; sort -k 10 est.fa.psl > est.fa.psl.sorted
+	cd /mnt/data; ../source/pslReps -nohead -singleHit est.fa.psl.sorted est.psl.best info
+	cd /mnt/data; sort -k 10 mrna.fa.psl > mrna.fa.psl.sorted
+	cd /mnt/data; ../source/pslReps -nohead -singleHit mrna.fa.psl.sorted mrna.psl.best info
 
 rsem-prepare-reference:
 
@@ -290,3 +294,19 @@ rsem-calculate-expr:
 		protocol/rsem_calculate_expr_single.sh
 	qsub -v input_read="line7i.se.fq",sample_name="line7i-rsem-local",index="all.local.fa.clean.nr" \
 		protocol/rsem_calculate_expr_single.sh
+
+cufflinks:
+
+	/mnt/source/cufflinks2/cufflinks -o line6u_cufflinks line6u_tophat/accepted_hits.bam
+	/mnt/source/cufflinks2/cufflinks -o line6i_cufflinks line6u_tophat/accepted_hits.bam
+	/mnt/source/cufflinks2/cufflinks -o line7u_cufflinks line6u_tophat/accepted_hits.bam
+	/mnt/source/cufflinks2/cufflinks -o line7i_cufflinks line6u_tophat/accepted_hits.bam
+	ls line*cufflinks/transcripts.gtf >> cufflinks.list
+	cuffmerge -o cuffmerge -s chick.fa -p 2 cufflinks.list
+
+gimme-assembly-cufflinks:
+
+	python /mnt/source/gimme/src/utils/gff2bed.py cuffmerge/transcripts.gtf > cuffmerge/transcripts.bed
+	python /mnt/source/gimme/src/gimme.py all.fa.clean.nr.bed cuffmerge/transcripts.bed > all.fa.clean.nr.cuff.bed
+
+gimme-assembly-cufflinks-mrna:
