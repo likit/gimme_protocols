@@ -245,6 +245,29 @@ run-tophat-mouse:
 	#cd /mnt/data; bowtie2-build mm9.fa mm9
 	cd /mnt/data; tophat2 -p 2 -r 150 -o tophat_mouse mm9 SRR203276_trim1.fastq SRR203276_trim2.fastq
 
+extract-reads-mouse:
+
+	cd tophat_mouse_strand; \
+	samtools index accepted_hits.bam; \
+	for chr in $$(cat ../protocol/mouse.list.txt); do \
+		printf "\textracting %s...\n" $$chr; \
+		samtools view -b -o local/$$chr.bam accepted_hits.bam $$chr; \
+	done
+
+local-velveth-mouse:
+
+	cd tophat_mouse_strand/local; \
+	for chr in *bam; do \
+		qsub -v input=$$chr ../../protocol/local_velveth.sh; \
+	done
+
+local-velvetg-mouse:
+
+	cd tophat_mouse_strand/local; \
+	for chr in *bam; do \
+		qsub -v input=$$chr ../../protocol/local_velvetg.sh; \
+	done
+
 ## mRNA and EST alignment
 ########################
 
@@ -313,6 +336,44 @@ gimme-assembly-cufflinks-mrna:
 
 filter-low-isopct:
 
-	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.bed *rsem-all.genes.results > all.fa.clean.nr.flt.bed
-	python protocol/filter-low-isopct.py 1.0 all.global.fa.clean.nr.bed *rsem-global.genes.results > all.global.fa.clean.nr.flt.bed
-	python protocol/filter-low-isopct.py 1.0 all.local.fa.clean.nr.bed *rsem-local.genes.results > all.local.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.bed *rsem-all.isoforms.results > all.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.global.fa.clean.nr.bed *rsem-global.isoforms.results > all.global.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.local.fa.clean.nr.bed *rsem-local.isoforms.results > all.local.fa.clean.nr.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.cuff.bed *rsem-all-cuff.isoforms.results > all.fa.clean.nr.cuff.flt.bed
+	python protocol/filter-low-isopct.py 1.0 all.fa.clean.nr.cuff.mrna.bed *rsem-all-cuff-mrna.isoforms.results > all.fa.clean.nr.cuff.mrna.flt.bed
+
+rsem-prepare-reference-cuff-and-asm:
+
+	#python ~/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.cuff.bed chick.fa > all.fa.clean.nr.cuff.bed.fa
+	#cat all.fa.clean.nr.cuff.bed.fa | python protocol/fasta-to-gene-list.py > all.fa.clean.nr.cuff.bed.txt
+	qsub -v list="all.fa.clean.nr.cuff.bed.txt",input="all.fa.clean.nr.cuff.bed.fa",sample="all.fa.clean.nr.cuff" protocol/rsem_prepare_reference.sh
+
+rsem-prepare-reference-cuff-and-asm-and-mrna:
+
+	cat all.fa.clean.nr.cuff.mrna.bed.fa | python protocol/fasta-to-gene-list.py > all.fa.clean.nr.cuff.mrna.bed.txt
+	qsub -v list="all.fa.clean.nr.cuff.mrna.bed.txt",input="all.fa.clean.nr.cuff.mrna.bed.fa",sample="all.fa.clean.nr.cuff.mrna" protocol/rsem_prepare_reference.sh
+
+rsem-prepare-reference-pasa:
+
+	cat pasa_all_4.assemblies.fasta | python ../protocol/fasta-to-gene-list.py > pasa_all_4.assemblies.bed.txt
+	qsub -v list="pasa_all_4.assemblies.bed.txt",input="pasa_all_4.assemblies.fasta",sample="pasa-assemblies" ../protocol/rsem_prepare_reference.sh
+
+rsem-calculate-expr-2:
+
+	qsub -v input_read="line6u.se.fq",sample_name="line6u-rsem-all-cuff",index="all.fa.clean.nr.cuff" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line6i.se.fq",sample_name="line6i-rsem-all-cuff",index="all.fa.clean.nr.cuff" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line7u.se.fq",sample_name="line7u-rsem-all-cuff",index="all.fa.clean.nr.cuff" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line7i.se.fq",sample_name="line7i-rsem-all-cuff",index="all.fa.clean.nr.cuff" \
+		protocol/rsem_calculate_expr_single.sh
+
+	qsub -v input_read="line6u.se.fq",sample_name="line6u-rsem-all-cuff-mrna",index="all.fa.clean.nr.cuff.mrna" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line6i.se.fq",sample_name="line6i-rsem-all-cuff-mrna",index="all.fa.clean.nr.cuff.mrna" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line7u.se.fq",sample_name="line7u-rsem-all-cuff-mrna",index="all.fa.clean.nr.cuff.mrna" \
+		protocol/rsem_calculate_expr_single.sh
+	qsub -v input_read="line7i.se.fq",sample_name="line7i-rsem-all-cuff-mrna",index="all.fa.clean.nr.cuff.mrna" \
+		protocol/rsem_calculate_expr_single.sh
