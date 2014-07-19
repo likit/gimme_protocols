@@ -1,25 +1,29 @@
-quality_trim:
+quality-trim:
 
 	qsub -v "fastq1=reads/line6i.se.fq" $(protocol)/quality_trim_se.sh
 	qsub -v "fastq1=reads/line6u.se.fq" $(protocol)/quality_trim_se.sh
 	qsub -v "fastq1=reads/line7u.se.fq" $(protocol)/quality_trim_se.sh
 	qsub -v "fastq1=reads/line7i.se.fq" $(protocol)/quality_trim_se.sh
 
-velveth:
+velveth-global:
 
-	qsub -v "input=reads/line6u.fq_trim.fastq" $(protocol)/velveth_job.sh
-	qsub -v "input=reads/line6i.fq_trim.fastq" $(protocol)/velveth_job.sh
-	qsub -v "input=reads/line7u.fq_trim.fastq" $(protocol)/velveth_job.sh
-	qsub -v "input=reads/line7i.fq_trim.fastq" $(protocol)/velveth_job.sh
+	qsub -v "outdir=line6u_global,input=reads/line6u.fq_trim.fastq" \
+		$(protocol)/velveth_job.sh
+	qsub -v "outdir=line6i_global,input=reads/line6i.fq_trim.fastq" \
+		$(protocol)/velveth_job.sh
+	qsub -v "outdir=line7u_global,input=reads/line7u.fq_trim.fastq" \
+		$(protocol)/velveth_job.sh
+	qsub -v "outdir=line7i_global,input=reads/line7i.fq_trim.fastq" \
+		$(protocol)/velveth_job.sh
 
-velvetg:
+velvetg-global:
 
-	qsub velvetg_line6i.sh
-	qsub velvetg_line6u.sh
-	qsub velvetg_line7i.sh
-	qsub velvetg_line7u.sh
+	qsub -v "inputdir=line6u_global" $(protocol)/velvetg_job.sh
+	qsub -v "inputdir=line6i_global" $(protocol)/velvetg_job.sh
+	qsub -v "inputdir=line7u_global" $(protocol)/velvetg_job.sh
+	qsub -v "inputdir=line7i_global" $(protocol)/velvetg_job.sh
 
-oases:
+oases-global:
 
 	qsub oases_line6i.sh
 	qsub oases_line6u.sh
@@ -28,10 +32,14 @@ oases:
 
 tophat:
 
-	qsub tophat_6147JAAXX_2_1_pf_trim.sh
-	qsub tophat_6147JAAXX_3_1_pf_trim.sh
-	qsub tophat_6147JAAXX_6_1_pf_trim.sh
-	qsub tophat_6147JAAXX_7_1_pf_trim.sh
+	qsub -v "input=reads/line6u.fq_trim.fastq,outdir=line6u_tophat,\
+		index=chick3_bowtie2" $(protocol)/tophat.sh
+	qsub -v "input=reads/line6i.fq_trim.fastq,outdir=line6i_tophat,\
+		index=chick3_bowtie2" $(protocol)/tophat.sh
+	qsub -v "input=reads/line7u.fq_trim.fastq,outdir=line7u_tophat,\
+		index=chick3_bowtie2" $(protocol)/tophat.sh
+	qsub -v "input=reads/line7i.fq_trim.fastq,outdir=line7i_tophat,\
+		index=chick3_bowtie2" $(protocol)/tophat.sh
 
 ########################
 # On EC2 Machine
@@ -265,12 +273,15 @@ local-velvetg-mouse:
 
 run-blat-mrna-est:
 
-	#cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit mrna.fa mrna.fa.psl
-	#cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit est.fa est.fa.psl
-	cd /mnt/data; sort -k 10 est.fa.psl > est.fa.psl.sorted
-	cd /mnt/data; ../source/pslReps -nohead -singleHit est.fa.psl.sorted est.psl.best info
-	cd /mnt/data; sort -k 10 mrna.fa.psl > mrna.fa.psl.sorted
-	cd /mnt/data; ../source/pslReps -nohead -singleHit mrna.fa.psl.sorted mrna.psl.best info
+	qsub -v "input=mrna.fa" $(protocol)/blat_job.sh
+	qsub -v "input=est.fa" $(protocol)/blat_job.sh
+
+sort-mrna-est-alignments:
+
+	sort -k 10 est.fa.psl > est.fa.psl.sorted
+	pslReps -nohead -singleHit est.fa.psl.sorted est.psl.best info
+	sort -k 10 mrna.fa.psl > mrna.fa.psl.sorted
+	pslReps -nohead -singleHit mrna.fa.psl.sorted mrna.psl.best info
 
 rsem-prepare-reference:
 
