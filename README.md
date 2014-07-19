@@ -1,15 +1,8 @@
 ##Setup working environment
 
-To setup an EC2 machine, do the following
++ Run
 
-###On Amazon EC2
-+ Launch EC2 instance with **beacon-2012.09.03 (ami-c17ec8a8)**. Choose **m1.large** for instance type.
-+ Create volume with (SNAPSHOT) and mount the volume to /mnt/data/
-+ Login as a root and go to **/root**
-+ Run **git clone https://github.com/likit/gimme_protocols.git protocols**
-+ Run **make -f protocols/Makefile install** in **/root** directory
-+ Open Ipython notebook by entering https://youramazonpublicdns in your browser (make sure HTTPS rule is included in your security group)
-+ Login to the notebook with a password "beacon"
+    git clone https://github.com/likit/gimme_protocols.git protocol
 
 ###All required packages
 
@@ -35,15 +28,16 @@ To setup an EC2 machine, do the following
 
 (*) _These packages are not required to run code in the Ipython notebook._
 
-###Data preprocessing
+###Data processing
 
-_Note: Preprocessing may take a long time. You can skip this step and use pre-preprocessed data to reproduce results in this notebook._
+_Note: Preprocessing may take a long time.
+Some steps need to be run on a computer cluster.
+You can skip this step and use pre-preprocessed data
+to reproduce results in this notebook._
 
-Run **make preprocess** to preprocess transcripts and other required data to be used in this notebook.
+Then, clean and remove redundant transcripts by running
 
-This step will take a while, so we recommend running it in Shell.
-
-In addition, each step can be run separately with its own make command. For example, running **make clean-transcript** will only run Seqclean to clean transcripts.
+    make preprocess
 
 Preprocessing includes the following steps:
 
@@ -51,7 +45,8 @@ Preprocessing includes the following steps:
 + **remove-redundant-transcripts :** remove redundant transcripts with CD-HIT
 + **find-unique-transcripts :** find unique transcripts between global and local assembly
 
-These steps are not included in preprocessing. We recommend using pre-preprocessed data:
+Run
 
-+ **run-blastx :** run BLASTX against mouse proteins
-+ **construct-gene-models :** run Gimme to construct gene models
+    make -f ~/gimme-protocol/makefile protcol=~/gimme-protocol sort-mrna-est-alignments
+
+to sort and select the best alignments (highest score) from mRNAs and ESTs.
