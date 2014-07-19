@@ -28,7 +28,7 @@
 
 (*) _These packages are not required to run code in the Ipython notebook._
 
-###Data processing
+##Data processing
 
 _Note: Preprocessing may take a long time.
 Some steps need to be run on a computer cluster.
@@ -36,15 +36,20 @@ You can skip this step and use pre-preprocessed data
 to reproduce results in this notebook._
 
 ###Quality trimming
+Run condetri:
 
     make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol quality-trim
 
+The quality score cutoff is 30 (default) and the
+first 10 nucleotides are hard trimmed.
+
 ###Global assembly
 
-Run
+Run Velveth and velvetg with kmer=21,23,25,27,29,31:
 
     make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol velveth-global
-Run
+
+do not proceed until the all velveth jobs are finished.
 
     make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol velvetg-global
 
@@ -58,8 +63,12 @@ Preprocessing includes the following steps:
 + **remove-redundant-transcripts :** remove redundant transcripts with CD-HIT
 + **find-unique-transcripts :** find unique transcripts between global and local assembly
 
-Run
+###EST and mRNAs alignments
+
+Run BLAT to align chicken mRNAs and ESTs:
+
+    make -f ~/gimme-protocol/makefile protcol=~/gimme-protocol run-blat-mrna-est
+
+Sort and select the best alignments (highest score) from mRNAs and ESTs.
 
     make -f ~/gimme-protocol/makefile protcol=~/gimme-protocol sort-mrna-est-alignments
-
-to sort and select the best alignments (highest score) from mRNAs and ESTs.
