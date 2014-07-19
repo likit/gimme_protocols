@@ -7,4 +7,4 @@
 #PBS -t 21,23,25,27,29,31
 
 cd ${PBS_O_WORKDIR}
-velvetg global_${PBS_ARRAYID} -read_trkg yes
+velvetg ${inputdir}_${PBS_ARRAYID} -read_trkg yes

@@ -35,6 +35,19 @@ Some steps need to be run on a computer cluster.
 You can skip this step and use pre-preprocessed data
 to reproduce results in this notebook._
 
+###Quality trimming
+
+    make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol quality-trim
+
+###Global assembly
+
+Run
+
+    make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol velveth-global
+Run
+
+    make -f ~/gimme-protocol/makefile protocol=~/gimme-protocol velvetg-global
+
 Then, clean and remove redundant transcripts by running
 
     make preprocess

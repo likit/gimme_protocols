@@ -4,4 +4,4 @@
 #PBS -N Velveth_global_gimme
 
 cd ${PBS_O_WORKDIR}
-velveth global 21,33,2 -fastq -short ${input}
+velveth ${outdir} 21,33,2 -fastq -short ${input}
