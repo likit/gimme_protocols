@@ -1,19 +1,16 @@
 quality_trim:
 
-	for f in *.gz; do \
-		gunzip $$f; \
-	done
-	qsub trim_6147JAAXX_2_1_pf.sh
-	qsub trim_6147JAAXX_3_1_pf.sh
-	qsub trim_6147JAAXX_6_1_pf.sh
-	qsub trim_6147JAAXX_7_1_pf.sh
+	qsub -v "fastq1=reads/line6i.se.fq" $(protocol)/quality_trim_se.sh
+	qsub -v "fastq1=reads/line6u.se.fq" $(protocol)/quality_trim_se.sh
+	qsub -v "fastq1=reads/line7u.se.fq" $(protocol)/quality_trim_se.sh
+	qsub -v "fastq1=reads/line7i.se.fq" $(protocol)/quality_trim_se.sh
 
 velveth:
 
-	qsub velveth_6147JAAXX_2_1.sh
-	qsub velveth_6147JAAXX_3_1.sh
-	qsub velveth_6147JAAXX_6_1.sh
-	qsub velveth_6147JAAXX_7_1.sh
+	qsub -v "input=reads/line6u.fq_trim.fastq" $(protocol)/velveth_job.sh
+	qsub -v "input=reads/line6i.fq_trim.fastq" $(protocol)/velveth_job.sh
+	qsub -v "input=reads/line7u.fq_trim.fastq" $(protocol)/velveth_job.sh
+	qsub -v "input=reads/line7i.fq_trim.fastq" $(protocol)/velveth_job.sh
 
 velvetg:
 
