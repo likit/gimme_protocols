@@ -5,4 +5,4 @@
 #PBS -N Blat_${PBS_JOBID}
 
 cd ${PBS_O_WORKDIR}
-blat -noHead -extendThroughN -mask=lower -out=psl chick_3.2bit ${input} ${input}.psl
+blat -noHead -extendThroughN -mask=lower -out=psl ${index} ${input} ${input}.psl

@@ -5,4 +5,4 @@
 #PBS -M preeyano@msu.edu
 
 cd ${PBS_O_WORKDIR}
-velveth global 21,33,2 -fastq -shortPaired ${pe_input} -short ${se_input}
+velveth mouse_global 21,33,2 -fastq -shortPaired ${pe_input} -short ${se_input} -strand_specific
