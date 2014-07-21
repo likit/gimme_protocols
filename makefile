@@ -25,10 +25,30 @@ velvetg-global:
 
 oases-global:
 
-	qsub oases_line6i.sh
-	qsub oases_line6u.sh
-	qsub oases_line7i.sh
-	qsub oases_line7u.sh
+	qsub -v "inputdir=line6u_global" $(protocol)/oases_job.sh
+	qsub -v "inputdir=line6i_global" $(protocol)/oases_job.sh
+	qsub -v "inputdir=line7u_global" $(protocol)/oases_job.sh
+	qsub -v "inputdir=line7i_global" $(protocol)/oases_job.sh
+
+velveth-M:
+
+	qsub $(protocol)/velveth_M.sh
+
+velvetg-M:
+
+	qsub $(protocol)/velvetg_M.sh
+
+oases-M:
+
+	qsub $(protocol)/oases_M.sh
+
+run-blat-oases-M:
+
+	cd global_merged; seqclean transcripts.fa -c 8
+
+	cd global_merged; \
+		qsub -v "input=transcripts.fa.clean,\
+		index=../chick_3.2bit" $(protocol)/blat_job.sh
 
 tophat:
 
@@ -41,140 +61,187 @@ tophat:
 	qsub -v "input=reads/line7i.fq_trim.fastq,outdir=line7i_tophat,\
 		index=chick3_bowtie2" $(protocol)/tophat.sh
 
-########################
-# On EC2 Machine
-########################
+extract-reads:
 
-tophat_ec2:
+	cd line6u_tophat; samtools index accepted_hits.bam
+	cd line6i_tophat; samtools index accepted_hits.bam
+	cd line7u_tophat; samtools index accepted_hits.bam
+	cd line7i_tophat; samtools index accepted_hits.bam
 
-	cd /mnt/data; tophat -p 2 -o line6u_tophat chick3_bowtie2 6147JAAXX_2_1_pf_trim.fastq
-	cd /mnt/data; tophat -p 2 -o line6i_tophat chick3_bowtie2 6147JAAXX_3_1_pf_trim.fastq
-	cd /mnt/data; tophat -p 2 -o line7u_tophat chick3_bowtie2 6147JAAXX_6_1_pf_trim.fastq
-	cd /mnt/data; tophat -p 2 -o line7i_tophat chick3_bowtie2 6147JAAXX_7_1_pf_trim.fastq
-
-index_samfiles:
-
-	cd /mnt/data/line6u_tophat; samtools index accepted_hits.bam
-	cd /mnt/data/line6i_tophat; samtools index accepted_hits.bam
-	cd /mnt/data/line7u_tophat; samtools index accepted_hits.bam
-	cd /mnt/data/line7i_tophat; samtools index accepted_hits.bam
-
-extract_reads:
-
-	cd /mnt/data; \
-	for dir in line*tophat; do \
-		cd $$dir; \
-		printf "working on %s:\n" $$dir; \
-		for chr in `cat /mnt/chromosomes.list`; do \
+	cd line6u_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
 			printf "\textracting %s...\n" $$chr; \
-			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; \
-		done; \
-		cd /mnt; \
-	done
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
 
-local_velveth:
+	cd line6i_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
 
-	cd /mnt/data; \
-	for dir in line*tophat; do \
-		cd $$dir; \
+	cd line7u_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+
+	cd line7i_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+
+local-velveth:
+
+	cd line6u_tophat; \
 		for chr in chr*bam; do \
-			velveth `basename $$chr .bam`_asm 21,33,2 -short -bam $$chr; \
-		done; \
-		cd /mnt; \
+			velveth $$(basename $$chr .bam) 21,33,2 -short -bam $$chr; done
+
+	cd line6i_tophat; \
+		for chr in chr*bam; do \
+			velveth $$(basename $$chr .bam) 21,33,2 -short -bam $$chr; done
+
+	cd line7u_tophat; \
+		for chr in chr*bam; do \
+			velveth $$(basename $$chr .bam) 21,33,2 -short -bam $$chr; done
+
+	cd line7i_tophat; \
+		for chr in chr*bam; do \
+			velveth $$(basename $$chr .bam) 21,33,2 -short -bam $$chr; done
+
+local-velvetg:
+
+	cd line6u_tophat; \
+		for chr in chr*_??; do \
+			velvetg $$chr -read_trkg yes; \
+		done
+
+	cd line6i_tophat; \
+		for chr in chr*_??; do \
+			velvetg $$chr -read_trkg yes; \
+		done
+
+	cd line7u_tophat; \
+		for chr in chr*_??; do \
+			velvetg $$chr -read_trkg yes; \
+		done
+
+	cd line7i_tophat; \
+		for chr in chr*_??; do \
+			velvetg $$chr -read_trkg yes; \
+		done
+
+
+local-oases:
+
+	cd line6u_tophat; \
+		for chr in chr*_??; do \
+			oases $$chr; done
+
+	cd line6i_tophat; \
+		for chr in chr*_??; do \
+			oases $$chr; done
+
+	cd line7u_tophat; \
+		for chr in chr*_??; do \
+			oases $$chr; done
+	
+	cd line7i_tophat; \
+		for chr in chr*_??; do \
+			oases $$chr; done
+
+combine-local-assembly-transcripts:
+
+	cd line6u_tophat; \
+	for d in chr*_??; do \
+	if [ -e $$d/transcripts.fa ]; then \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+			$$d/transcripts.fa line6u_local_$$d >> ../line6u_local.fa; \
+	fi; done
+
+	cd line6i_tophat; \
+	for d in chr*_??; do \
+	if [ -e $$d/transcripts.fa ]; then \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa line6i_local_$$d >> ../line6i_local.fa; \
+	fi; done
+
+	cd line7u_tophat; \
+	for d in chr*_??; do \
+	if [ -e $$d/transcripts.fa ]; then \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa line7u_local_$$d >> ../line7u_local.fa; \
+	fi; done
+
+	cd line7i_tophat; \
+	for d in chr*_??; do \
+	if [ -e $$d/transcripts.fa ]; then \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa line7i_local_$$d >> ../line7i_local.fa; \
+	fi; done
+
+combine-global-assembly-transcripts:
+
+	for d in line6u_global_*; do \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa $$d >> line6u_global.fa; \
 	done
 
-local_velvetg:
-
-	cd /mnt/data; \
-		for dir in line*tophat; do \
-		cd $$dir; \
-		for chr in chr*asm*; do \
-			velvetg $$chr -read_trkg yes -unused_reads yes; \
-		done; \
-		cd /mnt; \
+	for d in line6i_global_*; do \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa $$d >> line6i_global.fa; \
 	done
 
-local_oases:
-
-	cd /mnt/data; \
-		for dir in line*tophat; do \
-		cd $$dir; \
-		for chr in chr*asm*; do \
-			oases $$chr -unused_reads yes; \
-		done; \
-		cd /mnt; \
+	for d in line7u_global_*; do \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa $$d >> line7u_global.fa; \
 	done
 
-combine-transcripts:
-
-	cd /mnt/data/line6u_tophat; \
-	for d in chr*asm*; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line6u_local_$$d >> ../line6u_local.fa; \
-	done
-	cd /mnt/data/line6i_tophat; \
-	for d in chr*asm*; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line6i_local_$$d >> ../line6i_local.fa; \
-	done
-	cd /mnt/data/line7u_tophat; \
-	for d in chr*asm*; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line7u_local_$$d >> ../line7u_local.fa; \
-	done
-	cd /mnt/data/line7i_tophat; \
-	for d in chr*asm*; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$d/transcripts.fa line7i_local_$$d >> ../line7i_local.fa; \
-	done
-
-	cd /mnt/data/; \
-		for f in line6u_global_*.transcripts.fa; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line6u_global.fa; \
-	done
-	cd /mnt/data/; \
-		for f in line6i_global_*.transcripts.fa; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line6i_global.fa; \
-	done
-	cd /mnt/data/; \
-		for f in line7u_global_*.transcripts.fa; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line7u_global.fa; \
-	done
-	cd /mnt/data/; \
-		for f in line7i_global_*.transcripts.fa; \
-		do python /mnt/source/gimme/src/utils/rename_fasta.py $$f $$(basename $$f .transcripts.fa) >> line7i_global.fa; \
+	for d in line7i_global_*; do \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa $$d >> line7i_global.fa; \
 	done
 
 clean-transcripts:
 
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line6u_local.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line6i_local.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line7u_local.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line7i_local.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line6u_global.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line6i_global.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line7u_global.fa
-	cd /mnt/data/; /mnt/source/seqclean-x86_64/seqclean line7i_global.fa
+	seqclean line6u_local.fa
+	seqclean line6i_local.fa
+	seqclean line7u_local.fa
+	seqclean line7i_local.fa
+	seqclean line6u_global.fa
+	seqclean line6i_global.fa
+	seqclean line7u_global.fa
+	seqclean line7i_global.fa
 
-remove-redundant-transcripts:
+remove-redundant-all-assembly:
 
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line6u_local.fa.clean -o line6u_local.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line6i_local.fa.clean -o line6i_local.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line7u_local.fa.clean -o line7u_local.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line7i_local.fa.clean -o line7i_local.fa.clean.nr
+	cat line*_global.fa line*_local.fa > all_assembly.fa.clean
+	qsub -v "c=1.0,input=all_assembly.fa.clean,output=all_assembly.clean.nr" \
+		$(protocol)/cdhit_job.sh
 
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line6u_global.fa.clean -o line6u_global.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line6i_global.fa.clean -o line6i_global.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line7u_global.fa.clean -o line7u_global.fa.clean.nr
-	cd /mnt/data; /mnt/source/cd-hit-est -d 0 -c 1.0 -M 8000 -i line7i_global.fa.clean -o line7i_global.fa.clean.nr
+remove-redundant-local-assembly:
 
-preprocess: clean-transcripts remove-redundant-transcripts find-unique-transcripts
+	cat line*_local.fa > local_assembly.fa.clean
+	qsub -v "c=1.0,input=local_assembly.fa.clean,output=local_assembly.clean.nr" \
+		$(protocol)/cdhit_job.sh
 
-global_assembly: quality_trim velveth velvetg oases
+remove-redundant-global-assembly:
 
-local_assembly: tophat index_samfiles
+	cat line*_global.fa > global_assembly.fa.clean
+	qsub -v "c=1.0,input=global_assembly.fa.clean,output=global_assembly.clean.nr" \
+		$(protocol)/cdhit_job.sh
+
+run-blat-global-assembly:
+
+	qsub -v "input=global_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+
+run-blat-local-assembly:
+
+	qsub -v "input=local_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+
+run-blat-all-assembly:
+
+	qsub -v "input=all_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
 
 construct-gene-models-global:
 
-	cd /mnt/data; cat *global*clean.nr > all.global.fa.clean
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.global.fa.clean -o all.global.fa.clean.nr
-	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.global.fa.clean.nr all.global.fa.clean.nr.psl
 	cd /mnt/data; sort -k 10 all.global.fa.clean.nr.psl > all.global.fa.clean.nr.psl.sorted
 	cd /mnt/data; ../source/pslReps -nohead -singleHit all.global.fa.clean.nr.psl.sorted all.global.fa.clean.nr.psl.best info
 	cd /mnt/data; python ../source/gimme/src/gimme.py all.global.fa.clean.nr.psl.best > all.global.fa.clean.nr.bed
@@ -234,54 +301,6 @@ run-blastx:
 		blastx -evalue 1e-20 -outfmt 5 -query $$input -db mouse.proteins -out $$input.xml; \
 	done
 
-## Mouse data
-#######################
-quality-trim-mouse:
-
-	perl /mnt/source/condetri_v2.1.pl -fastq1=SRR203276_1.fastq -fastq2=SRR203276_2.fastq -sc=33 -prefix=SRR203276 -minlen=50 -cutfirst 10
-
-run-tophat-mouse:
-
-	#cd /mnt/data; bowtie2-build mm9.fa mm9
-	cd /mnt/data; tophat2 -p 2 -r 150 -o tophat_mouse mm9 SRR203276_trim1.fastq SRR203276_trim2.fastq
-
-extract-reads-mouse:
-
-	cd tophat_mouse_strand; \
-	samtools index accepted_hits.bam; \
-	for chr in $$(cat ../protocol/mouse.list.txt); do \
-		printf "\textracting %s...\n" $$chr; \
-		samtools view -b -o local/$$chr.bam accepted_hits.bam $$chr; \
-	done
-
-local-velveth-mouse:
-
-	cd tophat_mouse_strand/local; \
-	for chr in *bam; do \
-		qsub -v input=$$chr ../../protocol/local_velveth.sh; \
-	done
-
-local-velvetg-mouse:
-
-	cd tophat_mouse_strand/local; \
-	for chr in *bam; do \
-		qsub -v input=$$chr ../../protocol/local_velvetg.sh; \
-	done
-
-## mRNA and EST alignment
-########################
-
-run-blat-mrna-est:
-
-	qsub -v "input=mrna.fa" $(protocol)/blat_job.sh
-	qsub -v "input=est.fa" $(protocol)/blat_job.sh
-
-sort-mrna-est-alignments:
-
-	sort -k 10 est.fa.psl > est.fa.psl.sorted
-	pslReps -nohead -singleHit est.fa.psl.sorted est.psl.best info
-	sort -k 10 mrna.fa.psl > mrna.fa.psl.sorted
-	pslReps -nohead -singleHit mrna.fa.psl.sorted mrna.psl.best info
 
 rsem-prepare-reference:
 
@@ -323,12 +342,15 @@ rsem-calculate-expr:
 
 cufflinks:
 
-	/mnt/source/cufflinks2/cufflinks -o line6u_cufflinks line6u_tophat/accepted_hits.bam
-	/mnt/source/cufflinks2/cufflinks -o line6i_cufflinks line6u_tophat/accepted_hits.bam
-	/mnt/source/cufflinks2/cufflinks -o line7u_cufflinks line6u_tophat/accepted_hits.bam
-	/mnt/source/cufflinks2/cufflinks -o line7i_cufflinks line6u_tophat/accepted_hits.bam
-	ls line*cufflinks/transcripts.gtf >> cufflinks.list
-	cuffmerge -o cuffmerge -s chick.fa -p 2 cufflinks.list
+	qsub -v "outdir=line6u,input=line6u_tophat/accepted_hits.bam" $(protocol)/cufflinks.sh
+	qsub -v "outdir=line6i,input=line6i_tophat/accepted_hits.bam" $(protocol)/cufflinks.sh
+	qsub -v "outdir=line7u,input=line7u_tophat/accepted_hits.bam" $(protocol)/cufflinks.sh
+	qsub -v "outdir=line7i,input=line7i_tophat/accepted_hits.bam" $(protocol)/cufflinks.sh
+
+cufflinks-merge:
+
+	ls line*cuff/transcripts.gtf >> cufflinks.list
+	cuffmerge -o cuffmerge -s chick.fa -p 8 cufflinks.list
 
 gimme-assembly-cufflinks:
 
@@ -382,3 +404,98 @@ rsem-calculate-expr-2:
 		protocol/rsem_calculate_expr_single.sh
 	qsub -v input_read="line7i.se.fq",sample_name="line7i-rsem-all-cuff-mrna",index="all.fa.clean.nr.cuff.mrna" \
 		protocol/rsem_calculate_expr_single.sh
+
+## mRNA and EST alignment
+
+run-blat-mrna-est:
+
+	qsub -v "index=chick_3.2bit,input=mrna.fa" $(protocol)/blat_job.sh
+	qsub -v "index=chick_3.2bit,input=est.fa" $(protocol)/blat_job.sh
+
+sort-mrna-est-alignments:
+
+	sort -k 10 est.fa.psl > est.fa.psl.sorted
+	pslReps -nohead -singleHit est.fa.psl.sorted est.psl.best info
+	sort -k 10 mrna.fa.psl > mrna.fa.psl.sorted
+	pslReps -nohead -singleHit mrna.fa.psl.sorted mrna.psl.best info
+
+## Mouse data
+
+quality-trim-mouse:
+
+	perl /mnt/source/condetri_v2.1.pl -fastq1=SRR203276_1.fastq -fastq2=SRR203276_2.fastq -sc=33 -prefix=SRR203276 -minlen=50 -cutfirst 10
+
+interleave-mouse-reads:
+
+	shuffleSequences_fastq.pl SRR203276_trim1.fastq SRR203276_trim2.fastq mouse-paired.fastq
+	
+velveth-mouse:
+
+	qsub -v "pe_input=mouse-paired.fastq,\
+		se_input=SRR203276_trim_unpaired.fastq" $(protocol)/velveth_mouse.sh
+
+velvetg-mouse:
+
+	qsub $(protocol)/velvetg_mouse.sh
+
+oases-mouse:
+
+	qsub $(protocol)/oases_mouse.sh
+
+run-tophat-mouse:
+
+	qsub -v "outdir=tophat_mouse,index=mm9,\
+		left=SRR203276_trim1.fastq,right=SRR203276_trim2.fastq,\
+		unpaired=SRR203276_trim_unpaired.fastq" \
+		$(protocol)/tophat_mouse.sh
+
+extract-reads-mouse:
+
+	cd tophat_mouse; \
+	samtools index accepted_hits.bam; \
+	for chr in $$(cat $(protocol)/mouse.list.txt); do \
+		printf "\textracting %s...\n" $$chr; \
+		samtools view -b -o $$chr.bam accepted_hits.bam $$chr; \
+	done
+
+local-velveth-mouse:
+
+	cd tophat_mouse; \
+	for chr in chr*bam; do \
+		velveth $$(basename $$chr .bam) 21,33,2 -bam -shortPaired -strand_specific $$chr; \
+	done
+
+local-velvetg-mouse:
+
+	cd tophat_mouse; \
+	for chr in chr*_??; do velvetg $$chr -read_trkg yes -ins_length 150 ; done
+
+local-oases-mouse:
+
+	cd tophat_mouse; \
+	for chr in chr*_??; do oases $$chr -ins_length 150 ; done
+
+combine-global-mouse-assembly-transcripts:
+
+	for d in mouse_global_*; do \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+		$$d/transcripts.fa $$d >> mouse_global.fa; \
+	done
+
+combine-local-mouse-assembly-transcripts:
+
+	cd tophat_mouse; \
+	for d in chr*_??; do \
+	if [ -e $$d/transcripts.fa ]; then \
+		python $(gimmedir)/src/utils/rename_fasta.py \
+			$$d/transcripts.fa mouse_local_$$d >> ../mouse_local.fa; \
+	fi; done
+
+clean-remove-redundant-mouse-transcripts:
+
+	seqclean mouse_local.fa -c 8
+	seqclean mouse_global.fa -c 8
+
+	cat mouse_local.fa.clean mouse_global.fa.clean > mouse_assembly.fa.clean
+	qsub -v "c=1.0,input=mouse_assembly.fa.clean,output=mouse_assembly.clean.nr" \
+		$(protocol)/cdhit_job.sh
