@@ -4,7 +4,8 @@
 #PBS -m abe
 #PBS -N Tophat_paired_${PBS_JOBID}
 
-module load bowtie2/2.1.0
+module load bowtie/1.0.0
+module load TopHat/1.2.0
 cd ${PBS_O_WORKDIR}
 
-~/tophat-2.0.9.Linux_x86_64/tophat --library-type fr-firststrand -r 150 -p 7 -o ${outdir} ${index} ${left} ${right},${unpaired}
+tophat --library-type fr-firststrand -r 150 -p 7 -o ${outdir} ${index} ${left} ${right},${unpaired}
