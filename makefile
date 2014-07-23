@@ -53,13 +53,13 @@ run-blat-oases-M:
 tophat:
 
 	qsub -v "input=reads/line6u.fq_trim.fastq,outdir=line6u_tophat,\
-		index=chick3_bowtie2" $(protocol)/tophat.sh
+		index=gal3" $(protocol)/tophat.sh
 	qsub -v "input=reads/line6i.fq_trim.fastq,outdir=line6i_tophat,\
-		index=chick3_bowtie2" $(protocol)/tophat.sh
+		index=gal3" $(protocol)/tophat.sh
 	qsub -v "input=reads/line7u.fq_trim.fastq,outdir=line7u_tophat,\
-		index=chick3_bowtie2" $(protocol)/tophat.sh
+		index=gal3" $(protocol)/tophat.sh
 	qsub -v "input=reads/line7i.fq_trim.fastq,outdir=line7i_tophat,\
-		index=chick3_bowtie2" $(protocol)/tophat.sh
+		index=gal3" $(protocol)/tophat.sh
 
 extract-reads:
 
@@ -201,14 +201,14 @@ combine-global-assembly-transcripts:
 
 clean-transcripts:
 
-	seqclean line6u_local.fa
-	seqclean line6i_local.fa
-	seqclean line7u_local.fa
-	seqclean line7i_local.fa
-	seqclean line6u_global.fa
-	seqclean line6i_global.fa
-	seqclean line7u_global.fa
-	seqclean line7i_global.fa
+	seqclean line6u_local.fa -c 16
+	seqclean line6i_local.fa -c 16
+	seqclean line7u_local.fa -c 16
+	seqclean line7i_local.fa -c 16
+	# seqclean line6u_global.fa -c 16
+	# seqclean line6i_global.fa -c 16
+	# seqclean line7u_global.fa -c 16
+	# seqclean line7i_global.fa -c 16
 
 remove-redundant-all-assembly:
 
@@ -242,45 +242,39 @@ run-blat-all-assembly:
 
 construct-gene-models-global:
 
-	cd /mnt/data; sort -k 10 all.global.fa.clean.nr.psl > all.global.fa.clean.nr.psl.sorted
-	cd /mnt/data; ../source/pslReps -nohead -singleHit all.global.fa.clean.nr.psl.sorted all.global.fa.clean.nr.psl.best info
-	cd /mnt/data; python ../source/gimme/src/gimme.py all.global.fa.clean.nr.psl.best > all.global.fa.clean.nr.bed
+	sort -k 10 global_assembly.clean.nr.psl > global_assembly.clean.nr.psl.sorted
+	pslReps -nohead -singleHit global_assembly.clean.nr.psl.sorted \
+		global_assembly.clean.nr.psl.best info
+
+	qsub -v input="global_assembly.clean.nr.psl.best,\
+		output=global_assembly_models.bed,gimme_dir=$(gimmedir)/src/" \
+		$(protocol)/run_gimme.sh
 
 construct-gene-models-local:
 
-	cd /mnt/data; cat *local*clean.nr > all.local.fa.clean
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.local.fa.clean -o all.local.fa.clean.nr
-	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.local.fa.clean.nr all.local.fa.clean.nr.psl
-	cd /mnt/data; sort -k 10 all.local.fa.clean.nr.psl > all.local.fa.clean.nr.psl.sorted
-	cd /mnt/data; ../source/pslReps -nohead -singleHit all.local.fa.clean.nr.psl.sorted all.local.fa.clean.nr.psl.best info
-	cd /mnt/data; python ../source/gimme/src/gimme.py all.local.fa.clean.nr.psl.best > all.local.fa.clean.nr.bed
+	sort -k 10 local_assembly.clean.nr.psl > local_assembly.clean.nr.psl.sorted
+	pslReps -nohead -singleHit local_assembly.clean.nr.psl.sorted \
+		local_assembly.clean.nr.psl.best info
+
+	qsub -v input="local_assembly.clean.nr.psl.best,\
+		output=local_assembly_models.bed,gimme_dir=$(gimmedir)/src/" \
+		$(protocol)/run_gimme.sh
 
 construct-gene-models-global-local:
 
-	cd /mnt/data; cat *clean.nr > all.fa.clean
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 1.0 -M 8000 -i all.fa.clean -o all.fa.clean.nr
-	cd /mnt/data; blat -noHead -out=psl -mask=lower -extendThroughN chick_3.2bit all.fa.clean.nr all.fa.clean.nr.psl
-	cd /mnt/data; sort -k 10 all.fa.clean.nr.psl > all.fa.clean.nr.psl.sorted
-	cd /mnt/data; ../source/pslReps -nohead -singleHit all.fa.clean.nr.psl.sorted all.fa.clean.nr.psl.best info
-	cd /mnt/data; python ../source/gimme/src/gimme.py all.fa.clean.nr.psl.best > all.fa.clean.nr.bed
+	sort -k 10 all_assembly.clean.nr.psl > all_assembly.clean.nr.psl.sorted
+	pslReps -nohead -singleHit all_assembly.clean.nr.psl.sorted \
+		all_assembly.clean.nr.psl.best info
 
-clean-up-gene-models-global:
+	qsub -v input="all_assembly.clean.nr.psl.best,\
+		output=all_assembly_models.bed,gimme_dir=$(gimmedir)/src/" \
+		$(protocol)/run_gimme.sh
 
-	cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.global.fa.clean.nr.bed chick.fa > all.global.fa.clean.nr.bed.fa
-	cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.global.fa.clean.nr.bed.fa -o all.global.fa.clean.nr.bed.fa.nr99
-	python ../source/gimme/src/utils/cdhit_transcript.py all.global.fa.clean.nr.bed all.global.fa.clean.nr.bed.fa.nr99 > all.global.fa.clean.nr.bed.fa.nr99.bed
-
-clean-up-gene-models-local:
-
-	#cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.local.fa.clean.nr.bed chick.fa > all.local.fa.clean.nr.bed.fa
-	#cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.local.fa.clean.nr.bed.fa -o all.local.fa.clean.nr.bed.fa.nr99
-	python ../source/gimme/src/utils/cdhit_transcript.py all.local.fa.clean.nr.bed all.local.fa.clean.nr.bed.fa.nr99 > all.local.fa.clean.nr.bed.fa.nr99.bed
-
-clean-up-gene-models-global-local:
+# clean-up-gene-models-global-local:
 
 	#cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
 	#cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
-	python ../source/gimme/src/utils/cdhit_transcript.py all.fa.clean.nr.bed all.fa.clean.nr.bed.fa.nr99 > all.fa.clean.nr.bed.fa.nr99.bed
+	# python ../source/gimme/src/utils/cdhit_transcript.py all.fa.clean.nr.bed all.fa.clean.nr.bed.fa.nr99 > all.fa.clean.nr.bed.fa.nr99.bed
 
 find-unique-transcripts:
 
@@ -301,15 +295,16 @@ run-blastx:
 		blastx -evalue 1e-20 -outfmt 5 -query $$input -db mouse.proteins -out $$input.xml; \
 	done
 
+rsem-prepare-reference-global-local:
 
-rsem-prepare-reference:
+	python $(gimmedir)/src/utils/get_transcript_seq.py \
+		all_assembly_models.bed chick.fa | grep -v DEBUG >  all_assembly_models.bed.fa
+	cat all_assembly_models.bed.fa | python $(protocol)/fasta-to-gene-list.py \
+		> all_assembly_models.bed.fa.txt
 
-	cat all.fa.clean.nr.bed.fa | python protocol/fasta-to-gene-list.py > all.fa.clean.nr.bed.txt
-	cat all.global.fa.clean.nr.bed.fa | python protocol/fasta-to-gene-list.py > all.global.fa.clean.nr.bed.txt
-	cat all.local.fa.clean.nr.bed.fa | python protocol/fasta-to-gene-list.py > all.local.fa.clean.nr.bed.txt
-	qsub -v list="all.fa.clean.nr.bed.txt",input="all.fa.clean.nr.bed.fa",sample="all.fa.clean.nr" protocol/rsem_prepare_reference.sh
-	qsub -v list="all.global.fa.clean.nr.bed.txt",input="all.global.fa.clean.nr.bed.fa",sample="all.global.fa.clean.nr" protocol/rsem_prepare_reference.sh
-	qsub -v list="all.local.fa.clean.nr.bed.txt",input="all.local.fa.clean.nr.bed.fa",sample="all.local.fa.clean.nr" protocol/rsem_prepare_reference.sh
+	qsub -v list="all_assembly_models.bed.fa.txt,\
+		input=all_assembly_models.bed.fa,sample=all-assembly-models" \
+		$(protocol)/rsem_prepare_reference.sh
 
 rsem-calculate-expr:
 
@@ -449,6 +444,16 @@ run-tophat-mouse:
 		unpaired=SRR203276_trim_unpaired.fastq" \
 		$(protocol)/tophat_mouse.sh
 
+run-tophat-mouse-old:
+
+	qsub -v "outdir=tophat_mouse,index=mm9,\
+		left=SRR203276_trim1.fastq,right=SRR203276_trim2.fastq,\
+		unpaired=SRR203276_trim_unpaired.fastq" tophat_mouse.sh
+
+cufflinks-mouse:
+
+	qsub -v "outdir=mouse_cufflinks,input=tophat_mouse/accepted_hits.bam" $(protocol)/cufflinks.sh
+
 extract-reads-mouse:
 
 	cd tophat_mouse; \
@@ -499,3 +504,20 @@ clean-remove-redundant-mouse-transcripts:
 	cat mouse_local.fa.clean mouse_global.fa.clean > mouse_assembly.fa.clean
 	qsub -v "c=1.0,input=mouse_assembly.fa.clean,output=mouse_assembly.clean.nr" \
 		$(protocol)/cdhit_job.sh
+
+run-blat-all-mouse-assembly:
+
+	qsub -v "input=mouse_assembly.clean.nr,index=mm9.fa" $(protocol)/blat_job.sh
+
+construct-gene-models-mouse:
+
+	# sort -k 10 mouse_assembly.clean.nr.psl > mouse_assembly.clean.nr.psl.sorted
+	# pslReps -nohead -singleHit mouse_assembly.clean.nr.psl.sorted \
+	# 	mouse_assembly.clean.nr.psl.best info
+
+	# grep -w $$chr mouse_assembly.clean.nr.psl.best > mouse_$$chr.psl; \
+
+	for chr in $$(cat $(protocol)/mouse.list.txt); do \
+		qsub -v input="mouse_$$chr.psl,output=mouse_$$chr.bed,\
+		gimme_dir=$(gimmedir)/src/" $(protocol)/run_gimme.sh; \
+	done
