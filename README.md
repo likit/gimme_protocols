@@ -85,6 +85,10 @@ Clean oases-M transcripts and align them to the chicken genome:
 
 ###Local assembly
 
+Map reads to chicken genome:
+
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL tophat
+
 Extract reads from chromosomes:
 
     make -f $PROTOCOL/makefile protocol=$PROTOCOL extract-reads
@@ -125,6 +129,18 @@ Align global and local transcripts to the chicken genome
     make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-global-assembly
     make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-local-assembly
 
+Construct gene models from global assembly:
+
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-global
+
+Construct gene models from local assembly:
+
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-local
+
+Construct gene models from global and local assembly:
+
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-global-local
+
 ###Build Cufflinks models
 
 Run cufflinks:
@@ -134,6 +150,11 @@ Run cufflinks:
 Run cufflinks merge:
 
     make -f $PROTOCOL/makefile cufflinks-merge
+
+
+###Reads mapping statistics
+
+Build bowtie index for gene models.
 
 ###Mouse data
 
@@ -176,6 +197,10 @@ Combine, clean and remove redundant transcripts:
     make -f $PROTOCOL/makefile gimmedir=$GIMMEDIR combine-global-mouse-assembly-transcripts
     make -f $PROTOCOL/makefile gimmedir=$GIMMEDIR combine-local-mouse-assembly-transcripts
     make -f $PROTOCOL/makefile protocol=$PROTOCOL clean-remove-redundant-mouse-transcripts
+
+Align mouse assembly to the mouse genome:
+
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-all-mouse-assembly
 
 ###EST and mRNAs alignments
 
