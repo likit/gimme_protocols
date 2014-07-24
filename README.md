@@ -8,10 +8,9 @@
 
 + Blat
 + BLAST+ 2.2.25
-+ Bowtie 1.0.0 for RSEM
-+ Bowtie2 2.1.0
-+ Tophat2 2.0.9
-+ Cufflinks2 2.1.1
++ Bowtie 1.0.0
++ Tophat 1.3.1
++ Cufflinks2 2.0.0
 + Seqclean
 + ESTscan 3.0.3
 + Gimme package 0.97 (need a new release)
@@ -151,11 +150,6 @@ Run cufflinks merge:
 
     make -f $PROTOCOL/makefile cufflinks-merge
 
-
-###Reads mapping statistics
-
-Build bowtie index for gene models.
-
 ###Mouse data
 
 Quality trim:
@@ -180,7 +174,7 @@ Run Oases:
 
 Run Tophat:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-tophat-mouse
+    make -f $PROTOCOL/makefile protocol=$PROTOCOL tophat-mouse
 
 Extract reads:
 
@@ -211,3 +205,14 @@ Run BLAT to align chicken mRNAs and ESTs:
 Sort and select the best alignments (highest score) from mRNAs and ESTs.
 
     make -f $PROTOCOL/makefile protcol=$PROTOCOL sort-mrna-est-alignments
+
+###Splice junctions analysis
+
+Align global transcripts k21 and k31 to chicken genome:
+
+    make -f $PROTOCOL/makefile protcol=$PROTOCOL run-blat-global-two-kmers
+
+###Reads mapping statistics
+
+Build bowtie index for gene models.
+
