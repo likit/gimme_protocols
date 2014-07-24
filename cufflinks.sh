@@ -5,5 +5,5 @@
 #PBS -N Cufflinks_gimme${PBS_JOBID}
 
 cd ${PBS_O_WORKDIR}
-module load cufflinks/2.1.1
+module load cufflinks/2.0.0
 cufflinks -p 4 -o ${outdir}_cuff ${input}
