@@ -1,9 +1,9 @@
 quality-trim:
 
-	qsub -v "fastq1=reads/line6i.se.fq" $(protocol)/quality_trim_se.sh
-	qsub -v "fastq1=reads/line6u.se.fq" $(protocol)/quality_trim_se.sh
-	qsub -v "fastq1=reads/line7u.se.fq" $(protocol)/quality_trim_se.sh
-	qsub -v "fastq1=reads/line7i.se.fq" $(protocol)/quality_trim_se.sh
+	qsub -v "input=reads/line6i.se.fq" $(protocol)/quality_trim_se_job.sh
+	qsub -v "input=reads/line6u.se.fq" $(protocol)/quality_trim_se_job.sh
+	qsub -v "input=reads/line7u.se.fq" $(protocol)/quality_trim_se_job.sh
+	qsub -v "input=reads/line7i.se.fq" $(protocol)/quality_trim_se_job.sh
 
 velveth-global:
 
@@ -42,21 +42,6 @@ oases-M:
 
 	qsub $(protocol)/oases_M.sh
 
-run-blat-global-two-kmers:
-
-	# cat line*global_21/transcripts.fa > global_k21.fa
-	# cat line*global_31/transcripts.fa > global_k31.fa
-	# seqclean global_k21.fa -c 8
-	# seqclean global_k31.fa -c 8
-	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i global_k21.fa.clean -o global_k21.fa.clean.nr
-	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i global_k31.fa.clean -o global_k31.fa.clean.nr
-
-	qsub -v "input=global_k21.fa.clean.nr,\
-		index=chick_3.2bit" $(protocol)/blat_job.sh
-
-	qsub -v "input=global_k31.fa.clean.nr,\
-		index=chick_3.2bit" $(protocol)/blat_job.sh
-
 run-blat-oases-M:
 
 	cd global_merged; seqclean transcripts.fa -c 8
@@ -64,6 +49,13 @@ run-blat-oases-M:
 	cd global_merged; \
 		qsub -v "input=transcripts.fa.clean,\
 		index=../chick_3.2bit" $(protocol)/blat_job.sh
+
+sort-oases-M-alignments:
+
+	cd global_merged; \
+		sort -k 10 transcripts.fa.clean.psl > transcripts.fa.clean.psl.sorted; \
+		pslReps -nohead -singleHit transcripts.fa.clean.psl.sorted \
+		transcripts.fa.clean.psl.best info
 
 tophat:
 
@@ -76,32 +68,32 @@ tophat:
 	qsub -v "input=reads/line7i.fq_trim.fastq,outdir=line7i_tophat,\
 		index=gga3" $(protocol)/tophat.sh
 
-# extract-reads:
-# 
-# 	cd line6u_tophat; samtools index accepted_hits.bam
-# 	cd line6i_tophat; samtools index accepted_hits.bam
-# 	cd line7u_tophat; samtools index accepted_hits.bam
-# 	cd line7i_tophat; samtools index accepted_hits.bam
-# 
-# 	cd line6u_tophat; \
-# 		for chr in $$(cat ../chromosomes.list); do \
-# 			printf "\textracting %s...\n" $$chr; \
-# 			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
-# 
-# 	cd line6i_tophat; \
-# 		for chr in $$(cat ../chromosomes.list); do \
-# 			printf "\textracting %s...\n" $$chr; \
-# 			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
-# 
-# 	cd line7u_tophat; \
-# 		for chr in $$(cat ../chromosomes.list); do \
-# 			printf "\textracting %s...\n" $$chr; \
-# 			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
-# 
-# 	cd line7i_tophat; \
-# 		for chr in $$(cat ../chromosomes.list); do \
-# 			printf "\textracting %s...\n" $$chr; \
-# 			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+extract-reads:
+
+	cd line6u_tophat; samtools index accepted_hits.bam
+	cd line6i_tophat; samtools index accepted_hits.bam
+	cd line7u_tophat; samtools index accepted_hits.bam
+	cd line7i_tophat; samtools index accepted_hits.bam
+
+	cd line6u_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+
+	cd line6i_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+
+	cd line7u_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
+
+	cd line7i_tophat; \
+		for chr in $$(cat ../chromosomes.list); do \
+			printf "\textracting %s...\n" $$chr; \
+			samtools view -b -o $$chr.bam accepted_hits.bam $$chr; done
 
 local-velveth:
 
@@ -143,29 +135,29 @@ local-oases:
 
 combine-local-assembly-transcripts:
 
-	cd line6u_tophat; \
-	for d in assembly_??; do \
-	if [ -e $$d/transcripts.fa ]; then \
-		python $(gimmedir)/src/utils/rename_fasta.py \
-			$$d/transcripts.fa line6u_local_$$d >> ../line6u_local.fa; \
-	fi; done
+	# cd line6u_tophat; \
+	# for d in chr*_??; do \
+	# if [ -e $$d/transcripts.fa ]; then \
+	# 	python $(gimmedir)/src/utils/rename_fasta.py \
+	# 		$$d/transcripts.fa line6u_local_$$d >> ../line6u_local.fa; \
+	# fi; done
 
-	cd line6i_tophat; \
-	for d in assembly_??; do \
-	if [ -e $$d/transcripts.fa ]; then \
-		python $(gimmedir)/src/utils/rename_fasta.py \
-		$$d/transcripts.fa line6i_local_$$d >> ../line6i_local.fa; \
-	fi; done
+	# cd line6i_tophat; \
+	# for d in chr*_??; do \
+	# if [ -e $$d/transcripts.fa ]; then \
+	# 	python $(gimmedir)/src/utils/rename_fasta.py \
+	# 	$$d/transcripts.fa line6i_local_$$d >> ../line6i_local.fa; \
+	# fi; done
 
-	cd line7u_tophat; \
-	for d in assembly_??; do \
-	if [ -e $$d/transcripts.fa ]; then \
-		python $(gimmedir)/src/utils/rename_fasta.py \
-		$$d/transcripts.fa line7u_local_$$d >> ../line7u_local.fa; \
-	fi; done
+	# cd line7u_tophat; \
+	# for d in chr*_??; do \
+	# if [ -e $$d/transcripts.fa ]; then \
+	# 	python $(gimmedir)/src/utils/rename_fasta.py \
+	# 	$$d/transcripts.fa line7u_local_$$d >> ../line7u_local.fa; \
+	# fi; done
 
 	cd line7i_tophat; \
-	for d in assembly_??; do \
+	for d in chr*_??; do \
 	if [ -e $$d/transcripts.fa ]; then \
 		python $(gimmedir)/src/utils/rename_fasta.py \
 		$$d/transcripts.fa line7i_local_$$d >> ../line7i_local.fa; \
@@ -195,56 +187,64 @@ combine-global-assembly-transcripts:
 
 clean-transcripts:
 
-	seqclean line6u_local.fa -c 16
-	seqclean line6i_local.fa -c 16
-	seqclean line7u_local.fa -c 16
+	# seqclean line6u_local.fa -c 16
+	# seqclean line6i_local.fa -c 16
+	# seqclean line7u_local.fa -c 16
 	seqclean line7i_local.fa -c 16
-	seqclean line6u_global.fa -c 16
-	seqclean line6i_global.fa -c 16
-	seqclean line7u_global.fa -c 16
-	seqclean line7i_global.fa -c 16
+	# seqclean line6u_global.fa -c 16
+	# seqclean line6i_global.fa -c 16
+	# seqclean line7u_global.fa -c 16
+	# seqclean line7i_global.fa -c 16
 
 remove-redundant-transcripts:
 
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6u_local.fa.clean -o line6u_local.fa.clean.nr
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6i_local.fa.clean -o line6i_local.fa.clean.nr
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7u_local.fa.clean -o line7u_local.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6u_local.fa.clean -o line6u_local.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6i_local.fa.clean -o line6i_local.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7u_local.fa.clean -o line7u_local.fa.clean.nr
 	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7i_local.fa.clean -o line7i_local.fa.clean.nr
 
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6u_global.fa.clean -o line6u_global.fa.clean.nr
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6i_global.fa.clean -o line6i_global.fa.clean.nr
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7u_global.fa.clean -o line7u_global.fa.clean.nr
-	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7i_global.fa.clean -o line7i_global.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6u_global.fa.clean -o line6u_global.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line6i_global.fa.clean -o line6i_global.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7u_global.fa.clean -o line7u_global.fa.clean.nr
+	# cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i line7i_global.fa.clean -o line7i_global.fa.clean.nr
 
 remove-redundant-all-assembly:
 
-	cat line*_global.fa line*_local.fa > all_assembly.fa.clean
+	cat line*_global.fa.clean.nr line*_local.fa.clean.nr > all_assembly.fa.clean
 	qsub -v "c=1.0,input=all_assembly.fa.clean,output=all_assembly.clean.nr" \
 		$(protocol)/cdhit_job.sh
 
 remove-redundant-local-assembly:
 
-	cat line*_local.fa > local_assembly.fa.clean
+	cat line*_local.fa.clean.nr > local_assembly.fa.clean
 	qsub -v "c=1.0,input=local_assembly.fa.clean,output=local_assembly.clean.nr" \
 		$(protocol)/cdhit_job.sh
 
 remove-redundant-global-assembly:
 
-	cat line*_global.fa > global_assembly.fa.clean
+	cat line*_global.fa.clean.nr > global_assembly.fa.clean
 	qsub -v "c=1.0,input=global_assembly.fa.clean,output=global_assembly.clean.nr" \
 		$(protocol)/cdhit_job.sh
 
 run-blat-global-assembly:
 
-	qsub -v "input=global_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+	# qsub -v "input=global_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+	for f in global_assembly.clean.nr_*.fa; do \
+		qsub -v "input=$$f,index=chick_3.2bit" $(protocol)/blat_job.sh; \
+	done
 
 run-blat-local-assembly:
 
-	qsub -v "input=local_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+	for f in local_assembly.clean.nr_*.fa; do \
+		qsub -v "input=$$f,index=chick_3.2bit" $(protocol)/blat_job.sh; \
+	done
 
 run-blat-all-assembly:
 
-	qsub -v "input=all_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+	# qsub -v "input=all_assembly.clean.nr,index=chick_3.2bit" $(protocol)/blat_job.sh
+	for f in all_assembly.clean.nr_*.fa; do \
+		qsub -v "input=$$f,index=chick_3.2bit" $(protocol)/blat_job.sh; \
+	done
 
 construct-gene-models-global:
 
@@ -276,15 +276,9 @@ construct-gene-models-global-local:
 		output=all_assembly_models.bed,gimme_dir=$(gimmedir)/src/" \
 		$(protocol)/run_gimme.sh
 
-# clean-up-gene-models-global-local:
-
-	#cd /mnt/data; python /mnt/source/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.bed chick.fa > all.fa.clean.nr.bed.fa
-	#cd /mnt/data; cd-hit-est -T 0 -d 0 -c 0.99 -M 8000 -i all.fa.clean.nr.bed.fa -o all.fa.clean.nr.bed.fa.nr99
-	# python ../source/gimme/src/utils/cdhit_transcript.py all.fa.clean.nr.bed all.fa.clean.nr.bed.fa.nr99 > all.fa.clean.nr.bed.fa.nr99.bed
-
 find-unique-transcripts:
 
-	# python $(protocol)/assembly-diff.py line6u_local.fa.clean.nr line6u_global.fa.clean.nr
+	python $(protocol)/assembly-diff.py line6u_local.fa.clean.nr line6u_global.fa.clean.nr
 	python $(protocol)/assembly-diff.py line6i_local.fa.clean.nr line6i_global.fa.clean.nr
 	python $(protocol)/assembly-diff.py line7u_local.fa.clean.nr line7u_global.fa.clean.nr
 	python $(protocol)/assembly-diff.py line7i_local.fa.clean.nr line7i_global.fa.clean.nr
@@ -293,13 +287,25 @@ find-unique-transcripts:
 	python $(protocol)/assembly-diff.py line7u_global.fa.clean.nr line7u_local.fa.clean.nr
 	python $(protocol)/assembly-diff.py line7i_global.fa.clean.nr line7i_local.fa.clean.nr
 
-run-blastx:
+get-long-unique-regions:
 
-	cd /mnt/data; \
-	export BLASTDB=/mnt/data/data/blastdb; \
-	for input in *.uniq.long; do \
-		blastx -evalue 1e-20 -outfmt 5 -query $$input -db mouse.proteins -out $$input.xml; \
-	done
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line6u_global.fa.clean.nr.uniq 300 > line6u_global.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line6i_global.fa.clean.nr.uniq 300 > line6i_global.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line7u_global.fa.clean.nr.uniq 300 > line7u_global.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line7i_global.fa.clean.nr.uniq 300 > line7i_global.fa.clean.nr.uniq.long
+
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line6u_local.fa.clean.nr.uniq 300 > line6u_local.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line6i_local.fa.clean.nr.uniq 300 > line6i_local.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line7u_local.fa.clean.nr.uniq 300 > line7u_local.fa.clean.nr.uniq.long
+	python $(gimmedir)/src/utils/sizeSelect.py \
+		line7i_local.fa.clean.nr.uniq 300 > line7i_local.fa.clean.nr.uniq.long
 
 rsem-prepare-reference-global-local:
 
@@ -350,17 +356,27 @@ cufflinks:
 
 cufflinks-merge:
 
-	ls line*cuff/transcripts.gtf >> cufflinks.list
+	ls line*cuff/transcripts.gtf > cufflinks.list
 	cuffmerge -o cuffmerge -s chick.fa -p 8 cufflinks.list
 
-gimme-assembly-cufflinks:
+cufflinks-merge-ref:
 
-	python /mnt/source/gimme/src/utils/gff2bed.py cuffmerge/transcripts.gtf > cuffmerge/transcripts.bed
-	python /mnt/source/gimme/src/gimme.py all.fa.clean.nr.bed cuffmerge/transcripts.bed > all.fa.clean.nr.cuff.bed
+	ls line*cuff/transcripts.gtf > cufflinks.list
+	cuffmerge -g Gallus_gallus.WASHUC2.64.gtf -o cuffmerge-ref -s chick.fa -p 8 cufflinks.list
 
-gimme-assembly-cufflinks-mrna:
+construct-gene-models-global-local-cufflinks:
 
-	python /mnt/source/gimme/src/gimme.py mrna.psl.best  all.fa.clean.nr.bed cuffmerge/transcripts.bed > all.fa.clean.nr.cuff.mrna.bed
+	python $(protocol)/gff2bed.py cuffmerge/merged.gtf > cuffmerge/merged.bed
+	qsub -v input="all_assembly_models.bed cuffmerge/merged.bed,\
+		output=all_assembly_cufflinks_models.bed,gimme_dir=$(gimmedir)/src/" \
+		$(protocol)/run_gimme.sh
+
+construct-gene-models-global-local-cufflinks-ensembl:
+
+	python $(protocol)/gff2bed.py cuffmerge-ref/merged.gtf > cuffmerge-ref/merged.bed
+	qsub -v input="all_assembly_models.bed cuffmerge-ref/merged.bed,\
+		output=all_assembly_cufflinks_ensembl_models.bed,gimme_dir=$(gimmedir)/src/" \
+		$(protocol)/run_gimme.sh
 
 filter-low-isopct:
 
@@ -372,8 +388,8 @@ filter-low-isopct:
 
 rsem-prepare-reference-cuff-and-asm:
 
-	#python ~/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.cuff.bed chick.fa > all.fa.clean.nr.cuff.bed.fa
-	#cat all.fa.clean.nr.cuff.bed.fa | python protocol/fasta-to-gene-list.py > all.fa.clean.nr.cuff.bed.txt
+	python ~/gimme/src/utils/get_transcript_seq.py all.fa.clean.nr.cuff.bed chick.fa > all.fa.clean.nr.cuff.bed.fa
+	cat all.fa.clean.nr.cuff.bed.fa | python protocol/fasta-to-gene-list.py > all.fa.clean.nr.cuff.bed.txt
 	qsub -v list="all.fa.clean.nr.cuff.bed.txt",input="all.fa.clean.nr.cuff.bed.fa",sample="all.fa.clean.nr.cuff" protocol/rsem_prepare_reference.sh
 
 rsem-prepare-reference-cuff-and-asm-and-mrna:
@@ -458,36 +474,41 @@ run-tophat-mouse-old:
 
 cufflinks-mouse:
 
-	qsub -v "outdir=mouse_cufflinks,input=tophat_mouse/accepted_hits.bam" $(protocol)/cufflinks.sh
+	qsub -v "outdir=mouse,input=tophat_mouse/accepted_hits.bam" $(protocol)/cufflinks.sh
 
-# extract-reads-mouse:
-# 
-# 	cd tophat_mouse; \
-# 	samtools index accepted_hits.bam; \
-# 	for chr in $$(cat $(protocol)/mouse.list.txt); do \
-# 		printf "\textracting %s...\n" $$chr; \
-# 		samtools view -b -o $$chr.bam accepted_hits.bam $$chr; \
-# 	done
+extract-reads-mouse:
+
+	cd tophat_mouse; \
+	samtools index accepted_hits.bam; \
+	for chr in $$(cat $(protocol)/mouse.list.txt); do \
+		printf "\textracting %s...\n" $$chr; \
+		samtools view -b -o $$chr.bam accepted_hits.bam $$chr; \
+	done
 
 local-velveth-mouse:
 
 	cd tophat_mouse; \
-		qsub -v "outdir=assembly,input=accepted_hits.bam" \
-		$(protocol)/local_velveth_mouse.sh
+		for chr in chr*.bam; do \
+			velveth $$(basename $$chr .bam) 27 -bam -shortPaired $$chr -strand_specific; \
+		done
 
 local-velvetg-mouse:
 
 	cd tophat_mouse; \
-		qsub -v outdir=assembly $(protocol)/local_velvetg_mouse.sh
+		for chr in $$(cat $(protocol)/mouse.list.txt); do \
+			qsub -v outdir=$$chr $(protocol)/local_velvetg_mouse.sh; \
+		done
 
 local-oases-mouse:
 
 	cd tophat_mouse; \
-			qsub -v dir=assembly $(protocol)/oases_mouse.sh
+		for chr in $$(cat $(protocol)/mouse.list.txt); do \
+			oases $$chr -ins_length 300; \
+		done
 
 combine-global-mouse-assembly-transcripts:
 
-	for d in mouse_global_*; do \
+	for d in mouse_global_27; do \
 		python $(gimmedir)/src/utils/rename_fasta.py \
 		$$d/transcripts.fa $$d >> mouse_global.fa; \
 	done
@@ -495,9 +516,8 @@ combine-global-mouse-assembly-transcripts:
 combine-local-mouse-assembly-transcripts:
 
 	cd tophat_mouse; \
-		for d in assembly_??; do \
-			python $(gimmedir)/src/utils/rename_fasta.py \
-			$$d/transcripts.fa mouse_local_$$d >> ../mouse_local.fa; \
+		for chr in $$(cat $(protocol)/mouse.list.txt); do \
+			cat $$chr/transcripts.fa >> ../mouse_local.fa; \
 		done
 
 clean-remove-redundant-mouse-transcripts:
@@ -518,10 +538,399 @@ construct-gene-models-mouse:
 	# sort -k 10 mouse_assembly.clean.nr.psl > mouse_assembly.clean.nr.psl.sorted
 	# pslReps -nohead -singleHit mouse_assembly.clean.nr.psl.sorted \
 	# 	mouse_assembly.clean.nr.psl.best info
+	
+	# split positive and negative strand transcripts
+	
+	# awk '$$9=="+"' mouse_assembly.clean.nr.psl.best > mouse_assembly.clean.nr.psl.best.pos
+	# awk '$$9=="-"' mouse_assembly.clean.nr.psl.best > mouse_assembly.clean.nr.psl.best.neg
 
-	# grep -w $$chr mouse_assembly.clean.nr.psl.best > mouse_$$chr.psl; \
 
-	for chr in $$(cat $(protocol)/mouse.list.txt); do \
-		qsub -v input="mouse_$$chr.psl,output=mouse_$$chr.bed,\
-		gimme_dir=$(gimmedir)/src/" $(protocol)/run_gimme.sh; \
+	# qsub -v input="mouse_assembly.clean.nr.psl.best.neg,\
+	# 	output=mouse_assembly_models.neg.bed,gimme_dir=$(gimmedir)/src/" \
+	# 	$(protocol)/run_gimme_mouse.sh
+
+	# qsub -v input="mouse_assembly.clean.nr.psl.best.pos,\
+	# 	output=mouse_assembly_models.pos.bed,gimme_dir=$(gimmedir)/src/" \
+	# 	$(protocol)/run_gimme_mouse.sh
+
+	# cat mouse_assembly_models.pos.bed mouse_assembly_models.neg.bed > mouse_assembly_models.bed
+	python $(protocol)/select-mouse-genes.py $(protocol)/mouse.list.txt mouse_assembly_models.bed > tmp
+	mv tmp mouse_assembly_models.bed
+
+
+#############################
+# Junctions analysis
+############################
+
+run-blat-global-two-kmers:
+
+	cat line*global_21/transcripts.fa > global_k21.fa
+	cat line*global_31/transcripts.fa > global_k31.fa
+	seqclean global_k21.fa -c 8
+	seqclean global_k31.fa -c 8
+	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i global_k21.fa.clean -o global_k21.fa.clean.nr
+	cd-hit-est -T 8 -d 0 -c 1.0 -M 8000 -i global_k31.fa.clean -o global_k31.fa.clean.nr
+
+	qsub -v "input=global_k21.fa.clean.nr,\
+		index=chick_3.2bit" $(protocol)/blat_job.sh
+
+	qsub -v "input=global_k31.fa.clean.nr,\
+		index=chick_3.2bit" $(protocol)/blat_job.sh
+
+sort-blat-two-kmers:
+
+	sort -k 10 global_k21.fa.clean.nr.psl > global_k21.fa.clean.nr.psl.sorted
+	pslReps -nohead -singleHit global_k21.fa.clean.nr.psl.sorted \
+		global_k21.fa.clean.nr.psl.best info
+
+	sort -k 10 global_k31.fa.clean.nr.psl > global_k31.fa.clean.nr.psl.sorted
+	pslReps -nohead -singleHit global_k31.fa.clean.nr.psl.sorted \
+		global_k31.fa.clean.nr.psl.best info
+
+find-splice-junctions:
+
+	# python $(gimmedir)/src/utils/compare_junction.py --all -p global_k21.fa.clean.nr.psl.best
+	# python $(gimmedir)/src/utils/compare_junction.py --all -p global_k31.fa.clean.nr.psl.best
+	# cd global_merged; \
+	# 	python $(gimmedir)/src/utils/compare_junction.py --all -p \
+	# 	transcripts.fa.clean.psl.best
+	# python $(gimmedir)/src/utils/compare_junction.py --all -p est.psl.best
+	# python $(gimmedir)/src/utils/compare_junction.py --all -p mrna.psl.best
+	# python $(gimmedir)/src/utils/compare_junction.py --all -p \
+	# 	global_assembly.clean.nr.psl.best
+	# cd cuffmerge; \
+	# 	python $(protocol)/gff2bed.py merged.gtf > merged.bed; \
+	# 	python $(gimmedir)/src/utils/compare_junction.py --all -b merged.bed
+	# cd cuffmerge-ref; \
+	# 	python $(protocol)/gff2bed.py merged.gtf > merged.bed; \
+	# 	python $(gimmedir)/src/utils/compare_junction.py --all -b merged.bed
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b all_assembly_models.bed
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b all_assembly_cufflinks_models.bed
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b all_assembly_cufflinks_ensembl_models.bed
+	#
+	# python $(protocol)/src/utils/gff2bed.py Gallus_gallus.WASHUC2.64.gtf > Gallus_gallus.WASHUC2.64.bed
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b Mus_musculus.NCBIM37.64.bed
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b Gallus_gallus.WASHUC2.64.bed
+	#
+	# python $(gimmedir)/src/utils/compare_junction.py --all -b mouse_assembly_models.bed
+	# python $(protocol)/gff2bed.py mouse_cuff/transcripts.gtf > mouse_cuff/transcripts.bed
+	cd mouse_cuff; \
+		python $(protocol)/select-mouse-genes.py $(protocol)/mouse.list.txt \
+		transcripts.bed > transcripts.select.bed; \
+		python $(gimmedir)/src/utils/compare_junction.py --all -b transcripts.select.bed
+
+#####################
+# Read mappings
+####################
+
+ensembl-map:
+
+	qsub -v "input=reads/line6u.fq_trim.fastq,output=line6u.ensembl.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line6i.fq_trim.fastq,output=line6i.ensembl.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line7u.fq_trim.fastq,output=line7u.ensembl.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line7i.fq_trim.fastq,output=line7i.ensembl.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" \
+		$(protocol)/bowtie_job.sh
+
+	qsub -v "left=reads/line6u.1_trim1.fastq,\
+		right=reads/line6u.1_trim2.fastq,output=line6u.ensembl.pe.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line6i.1_trim1.fastq,\
+		right=reads/line6i.1_trim2.fastq,output=line6i.ensembl.pe.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" $(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line7u.1_trim1.fastq,\
+		right=reads/line7u.1_trim2.fastq,output=line7u.ensembl.pe.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" $(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line7i.1_trim1.fastq,\
+		right=reads/line7i.1_trim2.fastq,output=line7i.ensembl.pe.sam,\
+		index=Gallus_gallus.WASHUC2.64.cdna.all.fa" $(protocol)/bowtie_pe_job.sh
+
+build-bowtie-index-gimme-models:
+
+	python $(gimmedir)/src/utils/get_transcript_seq.py \
+		all_assembly_models.bed chick.fa > all_assembly_models.bed.fa
+	bowtie-build all_assembly_models.bed.fa all_assembly_models.bed.fa
+
+build-bowtie-index-cufflinks-models:
+
+	python $(gimmedir)/src/utils/get_transcript_seq.py \
+		cuffmerge/merged.bed chick.fa > cuffmerge/merged.bed.fa
+	# cd cuffmerge; \
+	# 	bowtie-build merged.bed.fa merged.bed.fa
+
+cufflinks-map:
+
+	cd cuffmerge; \
+	qsub -v "input=../reads/line6u.fq_trim.fastq,output=line6u.cufflinks.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	cd cuffmerge; \
+	qsub -v "input=../reads/line6i.fq_trim.fastq,output=line6i.cufflinks.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	cd cuffmerge; \
+	qsub -v "input=../reads/line7u.fq_trim.fastq,output=line7u.cufflinks.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	cd cuffmerge; \
+	qsub -v "input=../reads/line7i.fq_trim.fastq,output=line7i.cufflinks.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_job.sh
+
+	cd cuffmerge; \
+	qsub -v "left=../reads/line6u.1_trim1.fastq,\
+		right=../reads/line6u.1_trim2.fastq,output=line6u.cufflinks.pe.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	cd cuffmerge; \
+	qsub -v "left=../reads/line6i.1_trim1.fastq,\
+		right=../reads/line6i.1_trim2.fastq,output=line6i.cufflinks.pe.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	cd cuffmerge; \
+	qsub -v "left=../reads/line7u.1_trim1.fastq,\
+		right=../reads/line7u.1_trim2.fastq,output=line7u.cufflinks.pe.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	cd cuffmerge; \
+	qsub -v "left=../reads/line7i.1_trim1.fastq,\
+		right=../reads/line7i.1_trim2.fastq,output=line7i.cufflinks.pe.sam,\
+		index=merged.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+translate-cufflinks:
+
+	cd cuffmerge; estscan -M ../gallus.hm -t merged.bed.faa \
+		merged.bed.fa > merged.bed.fna
+
+blast-cufflinks-vs-mouse:
+
+	cd cuffmerge; \
+	qsub -v "prog=blastp,db=../mouse.protein.faa,\
+		query=merged.bed.faa,\
+		out=merged.bed.faa.blastp" \
+		$(protocol)/blast_job.sh
+
+parse-cufflinks-vs-mouse-blast:
+
+	cd cuffmerge; \
+	python $(gimmedir)/src/utils/blast_hits.py \
+		merged.bed.faa.blastp 1e-20 > \
+		merged.bed.faa.blastp.out
+
+get-sequences-cufflinks-gimme-models:
+
+	python $(gimmedir)/src/utils/get_transcript_seq.py \
+		all_assembly_cufflinks_models.bed chick.fa > \
+		all_assembly_cufflinks_models.bed.fa
+
+translate-cufflinks-gimme:
+
+	estscan -M gallus.hm -t all_assembly_cufflinks_models.bed.faa \
+		all_assembly_cufflinks_models.bed.fa > \
+		all_assembly_cufflinks_models.bed.fna
+
+blast-cufflinks-gimme-vs-mouse:
+
+	qsub -v "prog=blastp,db=mouse.protein.faa,\
+		query=all_assembly_cufflinks_models.bed.faa,\
+		out=all_assembly_cufflinks_models.bed.faa.blastp" \
+		$(protocol)/blast_job.sh
+
+parse-cufflinks-gimme-vs-mouse-blast:
+
+	python $(gimmedir)/src/utils/blast_hits.py \
+		all_assembly_cufflinks_models.bed.faa.blastp 1e-20 > \
+		all_assembly_cufflinks_models.bed.faa.blastp.out
+
+gimme-models-map:
+
+	qsub -v "input=reads/line6u.fq_trim.fastq,output=line6u.gimme.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line6i.fq_trim.fastq,output=line6i.gimme.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line7u.fq_trim.fastq,output=line7u.gimme.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_job.sh
+	qsub -v "input=reads/line7i.fq_trim.fastq,output=line7i.gimme.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_job.sh
+
+	qsub -v "left=reads/line6u.1_trim1.fastq,\
+		right=reads/line6u.1_trim2.fastq,output=line6u.gimme.pe.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line6i.1_trim1.fastq,\
+		right=reads/line6i.1_trim2.fastq,output=line6i.gimme.pe.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line7u.1_trim1.fastq,\
+		right=reads/line7u.1_trim2.fastq,output=line7u.gimme.pe.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+	qsub -v "left=reads/line7i.1_trim1.fastq,\
+		right=reads/line7i.1_trim2.fastq,output=line7i.gimme.pe.sam,\
+		index=all_assembly_models.bed.fa" \
+		$(protocol)/bowtie_pe_job.sh
+
+mouse-gimme-models-map:
+
+	# SRR203276_trim_unpaired.fastq
+
+	# qsub -v "left=SRR203276_trim1.fastq,right=SRR203276_trim2.fastq,\
+	# output=line6u.gimme.pe.sam,index=all_assembly_models.bed.fa" \
+	# $(protocol)/bowtie_pe_job.sh
+
+count-spliced-reads-ensembl:
+
+	for f in *ensembl*sam; do \
+		samtools view -b -S $$f -o $$(basename $$f .sam).bam; \
 	done
+	
+	for f in *ensembl*bam; do \
+		samtools sort $$f $$(basename $$f .bam).sorted; \
+	done
+	
+	for f in *ensembl*sorted.bam; do samtools index $$f; done
+	
+	for f in *ensembl*sorted.bam; do \
+		python $(gimmedir)/src/utils/count_spliced_reads.py \
+		Gallus_gallus.WASHUC2.64.bed $$f > $$f.reads_counts; \
+	done
+
+count-spliced-reads-gimme:
+
+	# for f in *gimme*sam; do \
+	# 	samtools view -b -S $$f -o $$(basename $$f .sam).bam; \
+	# done
+
+	# for f in *gimme*bam; do \
+	# 	samtools sort $$f $$(basename $$f .bam).sorted; \
+	# done
+
+	# for f in *gimme*sorted.bam; do samtools index $$f; done
+
+	for f in *gimme*sorted.bam; do \
+		python $(gimmedir)/src/utils/count_spliced_reads.py \
+		all_assembly_models.bed $$f > $$f.reads_counts; \
+	done
+
+count-spliced-reads-cufflinks:
+
+	# cd cuffmerge; \
+	# for f in *sam; do \
+	# 	samtools view -b -S $$f -o $$(basename $$f .sam).bam; \
+	# done
+
+	# cd cuffmerge; \
+	# for f in *bam; do \
+	# 	samtools sort $$f $$(basename $$f .bam).sorted; \
+	# done
+	# 
+	# cd cuffmerge; \
+	# 	for f in *sorted.bam; do samtools index $$f; done
+	
+	cd cuffmerge; \
+		for f in *sorted.bam; do \
+			python $(gimmedir)/src/utils/count_spliced_reads.py \
+			merged.bed $$f > $$f.reads_counts; \
+		done
+
+#################
+# Homologs analysis
+################
+
+create-mouse-db:
+
+	wget ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.protein.faa.gz
+	gunzip mouse.protein.faa.gz
+	makeblastdb -in mouse.protein.faa -dbtype prot -parse_seqids -out mouse.protein.faa
+
+gimme-vs-mouse-blastx:
+
+	qsub -v "prog=blastx,db=mouse.protein.faa,\
+		query=all_assembly_models.bed.fa,\
+		out=all_assembly_models.bed.fa.blastx" \
+		$(protocol)/blast_job.sh
+
+gimme-vs-mouse-blastp:
+
+	# translate cDNA sequences
+	# estscan -M gallus.hm -t all_assembly_models.bed.faa \
+	# 	all_assembly_models.bed.fa > all_assembly_models.bed.fna
+
+	# qsub -v "prog=blastp,db=mouse.protein.faa,\
+	# 	query=all_assembly_models.bed.faa,\
+	# 	out=all_assembly_models.bed.faa.blastp" \
+	# 	$(protocol)/blast_job.sh
+
+	python $(gimmedir)/src/utils/blast_hits.py \
+		all_assembly_models.bed.faa.blastp 1e-20 > \
+		all_assembly_models.bed.faa.blastp.out
+
+run-blastx-unique-regions:
+
+	for input in *.uniq.long; do \
+		qsub -v prog=blastx,query=$$input,db=mouse.protein.faa,out=$$input.xml \
+		$(protocol)/blast_job.sh; \
+	done
+
+find-mouse-match:
+
+	for f in *uniq.long.xml; do \
+		python $(protocol)/find_match.py $$f; \
+	done
+
+reads-error-profile:
+
+	qsub -v "input=reads/line6u.se.fq.gz,outdir=line6u_untrim,\
+		index=gga3" $(protocol)/tophat.sh
+	qsub -v "input=reads/line6i.se.fq.gz,outdir=line6i_untrim,\
+		index=gga3" $(protocol)/tophat.sh
+	qsub -v "input=reads/line7u.se.fq.gz,outdir=line7u_untrim,\
+		index=gga3" $(protocol)/tophat.sh
+	qsub -v "input=reads/line7i.se.fq.gz,outdir=line7i_untrim,\
+		index=gga3" $(protocol)/tophat.sh
+	#
+	cd line6u_untrim; samtools calmd -b accepted_hits.bam \
+		../chick.fa > line6u.bam; \
+		samtools index line6u.bam; \
+		python $(gimmedir)/src/utils/read_error_profile.py line6u.bam \
+		> line6u.profile
+
+	cd line6i_untrim; samtools calmd -b accepted_hits.bam \
+		../chick.fa > line6i.bam; \
+		samtools index line6i.bam; \
+		python $(gimmedir)/src/utils/read_error_profile.py line6i.bam \
+		> line6i.profile
+
+	cd line7u_untrim; samtools calmd -b accepted_hits.bam \
+		../chick.fa > line7u.bam; \
+		samtools index line7u.bam; \
+		python $(gimmedir)/src/utils/read_error_profile.py line7u.bam \
+		> line7u.profile
+
+	cd line7i_untrim; samtools calmd -b accepted_hits.bam \
+		../chick.fa > line7i.bam; \
+		samtools index line7i.bam; \
+		python $(gimmedir)/src/utils/read_error_profile.py line7i.bam \
+		> line7i.profile
+
