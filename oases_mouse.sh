@@ -1,5 +1,5 @@
 #!/bin/sh -login
-#PBS -l nodes=1:ppn=1,mem=128gb,walltime=24:00:00
+#PBS -l nodes=1:ppn=1,mem=48gb,walltime=24:00:00
 #PBS -M preeyano@msu.edu
 #PBS -m abe
 #PBS -N Oases_gimme_${PBS_JOBID}

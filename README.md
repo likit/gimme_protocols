@@ -3,6 +3,9 @@
 + Run
 
     git clone https://github.com/likit/gimme_protocols.git protocol
+    export PROTOCOL=<path to protocol>
+    export GIMMEDIR=<path to gimme>
+    alias runmake="make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR"
 
 ###All required packages
 
@@ -10,18 +13,19 @@
 + BLAST+ 2.2.25
 + Bowtie 1.0.0
 + Tophat 1.3.1
-+ Cufflinks2 2.0.0
++ Cufflinks 2.0.0
 + Seqclean
 + ESTscan 3.0.3
 + Gimme package 0.97 (need a new release)
 + Python 2.7
 + Biopython
++ Pysam
 + Velvet 1.2.03
 + Oases 0.2.06
-+ CDHIT 4.5.4
++ CDHIT 4.5.6
 + Condetri 2.1
 + Samtools 0.1.18
-+ khmer
++ khmer 0.8
 + screed
 + RSEM 1.2.7
 
@@ -37,7 +41,7 @@ to reproduce results and plots included in the paper._
 ###Quality trimming
 Run condetri:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL quality-trim
+    runmake quality-trim
 
 The quality score cutoff is 30 (default) and the
 first 10 nucleotides are hard trimmed.
@@ -46,19 +50,17 @@ first 10 nucleotides are hard trimmed.
 
 Run Velveth and Velvetg with kmer=21,23,25,27,29,31:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velveth-global
+    runmake velveth-global
 
 Do not proceed until the velveth job is finished.
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velvetg-global
+    runmake velvetg-global
 
 Run Oases:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL oases-global
+    runmake oases-global
 
 Then, clean and remove redundant transcripts by running
-
-    make preprocess
 
 Preprocessing includes the following steps:
 
@@ -68,87 +70,89 @@ Preprocessing includes the following steps:
 
 Run Velveth and Velvetg for OasesM:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velveth-M
+    runmake velveth-M
 
 Do not proceed until the velveth job is finished.
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velvetg-M
+    runmake velvetg-M
 
 Run OasesM:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL oases-M
+    runmake oases-M
 
 Clean oases-M transcripts and align them to the chicken genome:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-oases-M
+    runmake run-blat-oases-M
 
 ###Local assembly
 
 Map reads to chicken genome:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL tophat
+    runmake tophat
 
 Extract reads from chromosomes:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL extract-reads
+    runmake extract-reads
 
 Run Velveth local:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL local-velveth
+    runmake local-velveth
 
 Run Velvetg local:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL local-velvetg
+    runmake local-velvetg
 
 Run Oases local:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL local-oases
+    runmake local-oases
 
 Combine and clean transcripts:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR  combine-global-assembly-transcripts
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR  combine-local-assembly-transcripts
-    make -f $PROTOCOL/makefile clean-transcripts
+    runmake combine-global-assembly-transcripts combine-local-assembly-transcripts
+    runmake clean-transcripts
 
 Remove redundant transcripts:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL remove-redundant-all-assembly
+    runmake remove-redundant-all-assembly
 
 Align all transcripts to the chicken genome
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-all-assembly
+    runmake run-blat-all-assembly
 
 Remove redundant global and local transcripts:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL remove-redundant-global-assembly
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL remove-redundant-local-assembly
+    runmake remove-redundant-global-assembly remove-redundant-local-assembly
 
 Align global and local transcripts to the chicken genome
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-global-assembly
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-local-assembly
+    runmake run-blat-global-assembly run-blat-local-assembly
 
 Construct gene models from global assembly:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-global
+    runmake construct-gene-models-global
 
 Construct gene models from local assembly:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-local
+    runmake construct-gene-models-local
 
 Construct gene models from global and local assembly:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR construct-gene-models-global-local
+    runmake construct-gene-models-global-local
 
 ###Build Cufflinks models
 
 Run cufflinks:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL cufflinks
+    runmake cufflinks
 
 Run cufflinks merge:
 
-    make -f $PROTOCOL/makefile cufflinks-merge
+    runmake cufflinks-merge
+
+Construct global+local+cufflinks models:
+
+    runmake construct-gene-models-global-local-cufflinks
+
 
 ###Mouse data
 
@@ -156,61 +160,69 @@ Quality trim:
 
 Interleave reads:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL interleave-mouse-reads
+    runmake interleave-mouse-reads
 
 Run Velveth and Velvetg:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velveth-mouse
+    runmake velveth-mouse
 
 Note, mouse data is strand-specific.
 
 Do not proceed until the velveth job is finished.
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL velvetg-mouse
+    runmake velvetg-mouse
 
 Run Oases:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL oases-mouse
+    runmake oases-mouse
 
 Run Tophat:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL tophat-mouse
+    runmake tophat-mouse
 
 Extract reads:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL extract-reads-mouse
+    runmake extract-reads-mouse
 
 Run mouse local assembly:
 
-    make -f $PROTOCOL/makefile local-velveth-mouse
-    make -f $PROTOCOL/makefile local-velvetg-mouse
-    make -f $PROTOCOL/makefile local-oases-mouse
+    runmake local-velveth-mouse
+    runmake local-velvetg-mouse
+    runmake local-oases-mouse
 
 Combine, clean and remove redundant transcripts:
 
-    make -f $PROTOCOL/makefile gimmedir=$GIMMEDIR combine-global-mouse-assembly-transcripts
-    make -f $PROTOCOL/makefile gimmedir=$GIMMEDIR combine-local-mouse-assembly-transcripts
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL clean-remove-redundant-mouse-transcripts
+    runmake combine-global-mouse-assembly-transcripts
+    runmake combine-local-mouse-assembly-transcripts
+    runmake clean-remove-redundant-mouse-transcripts
 
 Align mouse assembly to the mouse genome:
 
-    make -f $PROTOCOL/makefile protocol=$PROTOCOL run-blat-all-mouse-assembly
+    runmake run-blat-all-mouse-assembly
+
+Note, mouse dataset is strand-specific.
+This version of Gimme does not support strand-specific data internally.
+Therefore, models of positive- and negative-strand genes are built separately.
+
+Construct mouse Gimme models:
+
+    runmake construct-mouse-models
 
 ###EST and mRNAs alignments
 
 Run BLAT to align chicken mRNAs and ESTs:
 
-    make -f $PROTOCOL/makefile protcol=$PROTOCOL run-blat-mrna-est
+    runmake run-blat-mrna-est
 
 Sort and select the best alignments (highest score) from mRNAs and ESTs.
 
-    make -f $PROTOCOL/makefile protcol=$PROTOCOL sort-mrna-est-alignments
+    runmake sort-mrna-est-alignments
 
 ###Splice junctions analysis
 
 Align global transcripts k21 and k31 to chicken genome:
 
-    make -f $PROTOCOL/makefile protcol=$PROTOCOL run-blat-global-two-kmers
+    runmake run-blat-global-two-kmers
 
 ###Reads mapping statistics
 

@@ -5,4 +5,4 @@
 #PBS -N Trimming_single_${PBS_JOBID}
 
 cd ${PBS_O_WORKDIR}
-perl ~/condetri_v2.1.pl -fastq1=${input} -sc=33 -cutfirst 10
+condetri_v2.1.pl -fastq1=${input} -sc=33 -cutfirst=10
