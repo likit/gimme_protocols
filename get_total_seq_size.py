@@ -22,8 +22,7 @@ def main():
     '''Main function'''
 
     infile = sys.argv[1]  # FASTA file
-    print 'Total sequences = %d\nTotal size = %d' % \
-            count(infile)
+    print '%d\t%d' % count(infile)
 
 
 if __name__=='__main__':
