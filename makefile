@@ -768,17 +768,9 @@ create-mouse-db:
 	wget ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.protein.faa.gz
 	gunzip mouse.protein.faa.gz
 	makeblastdb -in mouse.protein.faa -dbtype prot -parse_seqids -out mouse.protein.faa
-
-gimme-vs-mouse-blastx:
-
-	qsub -v "prog=blastx,db=mouse.protein.faa,\
-		query=all_assembly_models.bed.fa,\
-		out=all_assembly_models.bed.fa.blastx" \
-		$(protocol)/blast_job.sh
-
 gimme-vs-mouse-blastp:
 
-	translate cDNA sequences
+	# translate cDNA sequences
 	estscan -M gallus.hm -t all_assembly_models.bed.faa \
 		all_assembly_models.bed.fa > all_assembly_models.bed.fna
 

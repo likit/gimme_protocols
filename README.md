@@ -31,7 +31,7 @@ Run:
 
 (*) _These packages are not required to run code in the Ipython notebook._
 
-##Raw data processing
+##Pipeline
 
 _Note: These steps take days to finish and
 some of them need to be run on a big-mem computer.
@@ -231,6 +231,8 @@ Build bowtie index for gene models.
     runmake build-bowtie-index-cufflinks-models
     runmake gimme-models-map
     runmake cufflinks-map
+    runmake ensembl-map
+    (make bowtie index for ensembl?)
 
 ###Splice junctions analysis
 
@@ -245,7 +247,6 @@ Build bowtie index for gene models.
 ###Homology analysis
 
     runmake create-mouse-db
-    runmake gimme-vs-mouse-blastx
     runmake gimme-vs-mouse-blastp
     runmake run-blastx-unique-regions
     runmake find-mouse-match
