@@ -62,12 +62,6 @@ Run Oases:
 
 Then, clean and remove redundant transcripts by running
 
-Preprocessing includes the following steps:
-
-+ **clean-transcripts :** clean transcripts with seqclean
-+ **remove-redundant-transcripts :** remove redundant transcripts with CD-HIT
-+ **find-unique-transcripts :** find unique transcripts between global and local assembly
-
 Run Velveth and Velvetg for OasesM:
 
     runmake velveth-M
@@ -83,6 +77,10 @@ Run OasesM:
 Clean oases-M transcripts and align them to the chicken genome:
 
     runmake run-blat-oases-M
+
+Sort and filter alignments:
+
+    runmake sort-oases-M-alignments
 
 ###Local assembly
 
@@ -125,7 +123,9 @@ Remove redundant global and local transcripts:
 
 Align global and local transcripts to the chicken genome
 
-    runmake run-blat-global-assembly run-blat-local-assembly
+    runmake run-blat-global-assembly run-blat-local-assembly run-blat-all-assembly
+
+###Build assembly gene models
 
 Construct gene models from global assembly:
 
@@ -138,6 +138,11 @@ Construct gene models from local assembly:
 Construct gene models from global and local assembly:
 
     runmake construct-gene-models-global-local
+
+###Find unique transcripts from global and local assembly
+
+    runmake find-unique-transcripts
+    runmake get-long-unique-regions
 
 ###Build Cufflinks models
 
@@ -206,7 +211,7 @@ Therefore, models of positive- and negative-strand genes are built separately.
 
 Construct mouse Gimme models:
 
-    runmake construct-mouse-models
+    runmake construct-gene-models-mouse
 
 ###EST and mRNAs alignments
 
@@ -218,13 +223,42 @@ Sort and select the best alignments (highest score) from mRNAs and ESTs.
 
     runmake sort-mrna-est-alignments
 
-###Splice junctions analysis
-
-Align global transcripts k21 and k31 to chicken genome:
-
-    runmake run-blat-global-two-kmers
-
 ###Reads mapping statistics
 
 Build bowtie index for gene models.
 
+    runmake build-bowtie-index-gimme-models
+    runmake build-bowtie-index-cufflinks-models
+    runmake gimme-models-map
+    runmake cufflinks-map
+
+###Splice junctions analysis
+
+    runmake run-blat-global-two-kmers
+    runmake sort-blat-two-kmers
+    runmake find-splice-junctions
+
+    runmake count-spliced-reads-ensembl
+    runmake count-spliced-reads-gimme
+    runmake count-spliced-reads-cufflinks
+
+###Homology analysis
+
+    runmake create-mouse-db
+    runmake gimme-vs-mouse-blastx
+    runmake gimme-vs-mouse-blastp
+    runmake run-blastx-unique-regions
+    runmake find-mouse-match
+
+    runmake translate-cufflinks
+    runmake blast-cufflinks-vs-mouse
+    runmake parse-cufflinks-vs-mouse-blast
+
+    runmake get-sequences-cufflinks-gimme-models
+    runmake translate-cufflinks-gimme
+    runmake blast-cufflinks-gimme-vs-mouse
+    runmake parse-cufflinks-gimme-vs-mouse-blast
+
+###Error profiles
+
+    runmake reads-error-profile
