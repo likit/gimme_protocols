@@ -1,10 +1,13 @@
 ##Setup working environment
 
-+ Run
++ Run:
 
     git clone https://github.com/likit/gimme_protocols.git protocol
+
     export PROTOCOL=<path to protocol>
+
     export GIMMEDIR=<path to gimme>
+
     alias runmake="make -f $PROTOCOL/makefile protocol=$PROTOCOL gimmedir=$GIMMEDIR"
 
 ###All required packages
