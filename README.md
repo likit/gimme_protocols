@@ -35,8 +35,6 @@ Run:
 
 _Note: These steps take days to finish and
 some of them need to be run on a big-mem computer.
-You can skip this step and use pre-preprocessed data
-to reproduce results and plots included in the paper._
 
 ###Quality trimming
 Run condetri:
@@ -263,3 +261,16 @@ Build bowtie index for gene models.
 ###Error profiles
 
     runmake reads-error-profile
+
+###Analysis data
+
+On your local computer:
+
+    mkdir -p gimme/results/
+    cd gimme; git clone git@github.com:likit/gimme_protocols.git protocol
+
+Edit copypath variable in copy.mk according to your project path, then run:
+
+    make -f protocol/copy.mk
+
+Launch IPython server in protocol directory and run all cells.
