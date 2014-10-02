@@ -34,7 +34,7 @@ Run:
 ##Pipeline
 
 _Note: These steps take days to finish and
-some of them need to be run on a big-mem computer.
+some of them need to be run on a big-mem computer_.
 
 ###Quality trimming
 Run condetri:
@@ -262,7 +262,7 @@ Build bowtie index for gene models.
 
     runmake reads-error-profile
 
-###Analysis data
+###Data Analysis
 
 On your local computer:
 
@@ -273,4 +273,4 @@ Edit copypath variable in copy.mk according to your project path, then run:
 
     make -f protocol/copy.mk
 
-Launch IPython server in protocol directory and run all cells.
+Launch IPython server in protocol directory and run all cells in notebook.ipynb.
